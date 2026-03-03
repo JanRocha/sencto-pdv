@@ -108,3 +108,9 @@ export const fiscalIssueSchema = z.object({
   customerDoc: z.string().min(11),
   totalValue: z.number().positive(),
 });
+
+export const whatsappTestAlertSchema = z.object({
+  tutorPhone: z.string().min(10),
+  childName: z.string().min(2),
+  minutesRemaining: z.number().int().nonnegative(),
+});

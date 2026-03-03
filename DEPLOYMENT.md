@@ -1,4 +1,4 @@
-# SAGRADO PDV - Guia de Deployment
+# SANCTO PDV - Guia de Deployment
 
 ## Descrição Geral
 Sistema de Ponto de Venda (PDV) para parques de diversão infantis com gestão de ingressos, visitantes, festas, inventário de produtos e controle fiscal.
@@ -60,7 +60,12 @@ APP_ENV="development"  # ou "production"
 
 # Configurações Opcionais
 SEFAZ_AMBIENTE="homologacao"  # ou "producao"
+FISCAL_PROVIDER="mock"
+WHATSAPP_PROVIDER="mock"
+ERP_PROVIDER="mock"
 ```
+
+**Observação:** Com `FISCAL_PROVIDER="real"`, o sistema usa o stub de integração real e retorna indisponibilidade controlada para emissão/cancelamento até a homologação final do conector SEFAZ.
 
 ### Passo 4: Inicializar Banco de Dados (Primeira Vez Apenas)
 ```bash

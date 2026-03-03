@@ -20,6 +20,13 @@ Bem-vindo ao **SANCTO PDV** - Sistema de Ponto de Venda para Parques de Diversã
 - Scripts disponíveis
 - Segurança em produção
 
+### 🧭 Arquitetura e Diretrizes
+**Arquivo**: [`ARCHITECTURE.md`](ARCHITECTURE.md)
+- Princípios arquiteturais oficiais
+- Contextos de domínio
+- Estratégia de integrações (SEFAZ/WhatsApp/ERP)
+- Roadmap técnico incremental
+
 ### ✅ Checklist do Projeto
 **Arquivo**: [`CHECKLIST.md`](CHECKLIST.md)
 - Status de cada feature
@@ -49,6 +56,7 @@ Bem-vindo ao **SANCTO PDV** - Sistema de Ponto de Venda para Parques de Diversã
 ✅ **Banco de Dados Real** - 26 modelos com transações atômicas  
 ✅ **API REST Completa** - 10 rotas com 23 handlers  
 ✅ **Pronto para Produção** - TypeScript 100% tipado, build otimizado  
+✅ **Arquitetura Evolutiva** - Contratos de integração e roadmap para escala
 
 ---
 
