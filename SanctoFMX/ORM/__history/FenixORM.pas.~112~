@@ -1,0 +1,273 @@
+{
+  ORM para persistencia de dados
+  Unit utilizando generics para receber as classe modelos e gravar no banco
+}
+unit FenixORM;
+
+interface
+
+uses
+  FenixSQL,
+  System.TypInfo,
+  Rtti.Atributos,
+  FenixRTTI,
+  System.SysUtils,
+  System.RTTI,
+  System.Generics.Collections,
+  FireDAC.Stan.Option,
+  Firedac.stan.Param,
+  FireDAC.Comp.Client,
+  Data.DB;
+
+type
+  TFenixORM<T: class> = class
+  private
+    FPrimarykey: string;
+    FNomeTabela: string;
+    FConexao: TFDConnection;
+    FClasse: TObject;
+    FQuery: TFDQuery;
+//    FDataSource: TDataSource;
+    function ExecutarQuery(const pSQL: string): Boolean;
+    function Consultar(const pSQL: string): TFDQuery;
+  public
+    property NomeTabela: string read FNomeTabela;
+    function DataSource(pDataSource: TDataSource): TFenixORM<T>;
+
+    function Find(): TFDQuery; overload;
+    procedure Find(const pIdentificador: Integer; aValue: T); overload;
+    procedure Find(const pSQL: string; pClasse: T); overload;
+    procedure Find(pClasse: T;const pSQL: string); overload;
+    function Find(const pSQL: string): TFDQuery; overload;
+
+    function Insert(aValue: T): Boolean;
+    function Update(aValue: T): Boolean;
+    function Delete(aValue: T): Boolean;
+    function LastId(): Integer;
+    function CarregarOID(const pNomeTabela: string; const pID: Integer): string;
+    function RegistroExiste(const pOID: string): Integer;
+    constructor create(const pConexao: TFDConnection);
+    destructor Destroy; override;
+  end;
+
+implementation
+
+{ TFenixORM<T> }
+
+function TFenixORM<T>.CarregarOID(
+  const pNomeTabela: string;
+  const pID: Integer): string;
+begin
+  var lSQL :=      'SELECT'
+    + sLineBreak + '  OID'
+    + sLineBreak + 'FROM'
+    + sLineBreak + '  ' + pNomeTabela
+    + sLineBreak + 'WHERE'
+    + sLineBreak + '  (ID = :ID)';
+
+  var lQuery := TFDQuery.Create(nil);
+  try
+    lQuery.Connection := FConexao;
+    lQuery.SQL.Text := lSQL;
+    lQuery.ParamByName('ID').AsInteger := pID;
+    lQuery.Open();
+
+    Result := lQuery.FieldByName('OID').AsString;
+  finally
+    lQuery.Free;
+  end;
+end;
+
+function TFenixORM<T>.Consultar(const pSQL: string): TFDQuery;
+begin
+  Result := TFDQuery.Create(nil);
+  Result.UpdateOptions.AssignedValues := [uvEDelete,uvEInsert,uvEUpdate,uvCountUpdatedRecords,uvCheckRequired,uvCheckReadOnly,uvCheckUpdatable];
+  Result.Connection := FConexao;
+  Result.Open(pSQL);
+end;
+
+constructor TFenixORM<T>.create(const pConexao: TFDConnection);
+begin
+  FConexao := pConexao;
+  FQuery := TFDQuery.Create(nil);
+  FQuery.Connection := FConexao;
+
+  var lRTTI :=  TFenixRTTI<T>.Create(FClasse);
+  try
+    lRTTI.PrimaryKey(FPrimarykey);
+    lRTTI.TableName(FNomeTabela);
+  finally
+    lRTTI.Free;
+  end;
+end;
+
+function TFenixORM<T>.DataSource(pDataSource: TDataSource): TFenixORM<T>;
+begin
+
+end;
+
+function TFenixORM<T>.Delete(aValue: T): Boolean;
+begin
+  var lFenixSQL := TFenixSQL<T>.Create(TObject(aValue));
+  try
+    Result := ExecutarQuery(lFenixSQL.Delete());
+  finally
+    lFenixSQL.free();
+  end;
+end;
+
+destructor TFenixORM<T>.Destroy;
+begin
+  FQuery.Free;
+  inherited;
+end;
+
+function TFenixORM<T>.ExecutarQuery(const pSQL: string): Boolean;
+begin
+ var lQuery := TFDQuery.Create(nil);
+  try
+    lQuery.Connection := FConexao;
+    Result := lQuery.ExecSQL(pSQL) > 0;
+    FConexao.CommitRetaining;
+  finally
+    lQuery.Free();
+  end;
+end;
+
+procedure TFenixORM<T>.Find(pClasse: T; const pSQL: string);
+begin
+  var lQuery: TFDQuery;
+  var lFenixSQL := TFenixSQL<T>.Create(nil);
+  try
+    var lSQL: string;
+    lSQL := lFenixSQL.Select().Fields('*').Where('(1=1) ').Generate();
+
+    lSQL := lSQL + pSQL;
+
+    lQuery := Consultar(lSQL);
+    TFenixRTTI<T>.SerializarObjeto(lQuery, pClasse);
+  finally
+    lQuery.Free;
+    lFenixSQL.Free;
+  end;
+end;
+
+function TFenixORM<T>.Find(const pSQL: string): TFDQuery;
+begin
+  Result := Consultar(StringReplace(UpperCase(pSQL), '%S', EmptyStr, [rfReplaceAll]));
+end;
+
+function TFenixORM<T>.Find: TFDQuery;
+begin
+  var lSQL: string;
+  var lFenixSQL:= TFenixSQL<T>.Create(nil);
+  try
+   // TFenixSQL<T>.New(nil).Select(lSQL);
+    lSQL := lFenixSQL.Select().Fields('*').Generate();
+    Result := Consultar(lSQL);
+  finally
+    lFenixSQL.Free;
+  end;
+end;
+
+procedure TFenixORM<T>.Find(const pIdentificador: Integer; aValue: T);
+begin
+  var lQuery: TFDQuery;
+  var lSQL := TFenixSQL<T>.Create(aValue);
+  var lConsulta: string;
+  try
+    lSQL.SelectId(lConsulta);
+    lQuery := Consultar(Format(lConsulta, [pIdentificador]));
+    TFenixRTTI<T>.SerializarObjeto(lQuery, aValue);
+  finally
+    lSQL.Free;
+    lQuery.Free;
+  end;
+end;
+
+function TFenixORM<T>.Insert(aValue: T): Boolean;
+begin
+  FClasse := aValue;
+  var lFenixSQL := TFenixSQL<T>.Create(FClasse);
+  try
+    Result := ExecutarQuery(lFenixSQL.Insert());
+  finally
+    lFenixSQL.free();
+  end;
+end;
+
+function TFenixORM<T>.LastId: Integer;
+begin
+  var lSQL: string;
+  var lFenixSQL := TFenixSQL<T>.Create(FClasse);
+
+  try
+    lSQL := lFenixSQL.LastID();
+
+    var lQuery := Consultar(lSQL);
+    try
+      Result := lQuery.FieldByName(FPrimarykey).AsInteger;
+    finally
+      lQuery.Free();
+    end;
+  finally
+    lFenixSQL.Free;
+  end;
+end;
+
+function TFenixORM<T>.RegistroExiste(const pOID: string): Integer;
+begin
+  var lSQL :=      'SELECT'
+    + sLineBreak + '  1'
+    + sLineBreak + 'FROM'
+    + sLineBreak + '  ' + FNomeTabela
+    + sLineBreak + 'WHERE'
+    + sLineBreak + '  (OID = :OID)';
+
+  var lQuery := TFDQuery.Create(nil);
+  try
+    lQuery.Connection := FConexao;
+    lQuery.SQL.Text := lSQL;
+    lQuery.ParamByName('OID').AsString := pOID;
+    lQuery.Open();
+
+    Result := lQuery.FieldByName('ID').AsInteger;
+  finally
+    lQuery.Free;
+  end;
+
+end;
+
+function TFenixORM<T>.Update(aValue: T): Boolean;
+begin
+  var lFenixSQL := TFenixSQL<T>.Create(TObject(aValue));
+  try
+    Result := ExecutarQuery(lFenixSQL.Update());
+  finally
+    lFenixSQL.free();
+  end;
+end;
+
+procedure TFenixORM<T>.Find(const pSQL: string; pClasse: T);
+begin
+  var lQuery: TFDQuery;
+  var lFenixSQL := TFenixSQL<T>.Create(nil);
+  try
+    var lSQL: string;
+
+    if not pSQL.Contains('SELECT') then
+    begin
+      lSQL := lFenixSQL.Select().Fields('*').Where('(1=1) ').Generate();
+    end;
+
+    lSQL := lSQL + pSQL;
+
+    lQuery := Consultar(lSQL);
+    TFenixRTTI<T>.SerializarObjeto(lQuery, pClasse);
+  finally
+    lQuery.Free;
+    lFenixSQL.Free;
+  end;
+end;
+
+end.

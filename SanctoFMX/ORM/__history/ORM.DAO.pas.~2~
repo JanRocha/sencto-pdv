@@ -1,0 +1,12 @@
+unit ORM.DAO;
+
+interface
+
+uses
+  TDAO = class
+
+  end;
+
+implementation
+
+end.

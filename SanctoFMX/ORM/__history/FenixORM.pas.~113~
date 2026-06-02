@@ -1,0 +1,598 @@
+{
+  ORM para persistencia de dados
+  Unit utilizando generics para receber as classe modelos e gravar no banco
+}
+unit FenixORM;
+
+interface
+
+uses
+  FenixSQL,
+  System.TypInfo,
+  Rtti.Atributos,
+  FenixRTTI,
+  System.SysUtils,
+  System.Classes,
+  System.RTTI,
+  System.Generics.Collections,
+  FireDAC.Stan.Option,
+  Firedac.stan.Param,
+  FireDAC.Comp.Client,
+  Data.DB;
+
+type
+  TFenixORM<T: class> = class
+  private
+    FPrimarykey: string;
+    FNomeTabela: string;
+    FConexao: TFDConnection;
+    FClasse: TObject;
+    FTransacaoExplicita: Boolean;
+    FWhereCampo: string;
+    FWhereValor: TValue;
+    FUsarWhere: Boolean;
+//    FDataSource: TDataSource;
+    function ExecutarQuery(const pSQL: string): Boolean;
+    function ExecutarQueryParametrizada(const AResult: TSQLResult): Boolean;
+    function Consultar(const pSQL: string): TFDQuery;
+    procedure AplicarWhereParametrizado(const AQuery: TFDQuery);
+    procedure LimparWhere;
+  public
+    property NomeTabela: string read FNomeTabela;
+    function DataSource(pDataSource: TDataSource): TFenixORM<T>;
+
+    function Find(): TFDQuery; overload;
+    procedure Find(const pIdentificador: Integer; aValue: T); overload;
+    procedure Find(const pSQL: string; pClasse: T); overload;
+    procedure Find(pClasse: T;const pSQL: string); overload;
+    function Find(const pSQL: string): TFDQuery; overload;
+
+    function Insert(aValue: T): Boolean;
+    function Update(aValue: T): Boolean;
+    function Delete(aValue: T): Boolean;
+    function Save(aValue: T): Boolean;
+    function FindAll(const AFiltro: string = ''): TObjectList<T>;
+    function Count(const AFiltro: string = ''): Integer;
+    function Where(const ACampo: string; const AValor: TValue): TFenixORM<T>;
+    function LastId(): Integer;
+    function CarregarOID(const pNomeTabela: string; const pID: Integer): string;
+    function RegistroExiste(const pOID: string): Integer;
+    procedure BeginTransaction;
+    procedure Commit;
+    procedure Rollback;
+    constructor create(const pConexao: TFDConnection);
+    destructor Destroy; override;
+  end;
+
+implementation
+
+{ TFenixORM<T> }
+
+function TFenixORM<T>.CarregarOID(
+  const pNomeTabela: string;
+  const pID: Integer): string;
+begin
+  var lSQL :=      'SELECT'
+    + sLineBreak + '  OID'
+    + sLineBreak + 'FROM'
+    + sLineBreak + '  ' + pNomeTabela
+    + sLineBreak + 'WHERE'
+    + sLineBreak + '  (ID = :ID)';
+
+  var lQuery := TFDQuery.Create(nil);
+  try
+    lQuery.Connection := FConexao;
+    lQuery.SQL.Text := lSQL;
+    lQuery.ParamByName('ID').AsInteger := pID;
+    lQuery.Open();
+
+    Result := lQuery.FieldByName('OID').AsString;
+  finally
+    lQuery.Free;
+  end;
+end;
+
+function TFenixORM<T>.Consultar(const pSQL: string): TFDQuery;
+begin
+  var lOwner: TComponent := nil;
+  if Assigned(FConexao) then
+    lOwner := FConexao.Owner;
+
+  Result := TFDQuery.Create(lOwner);
+  Result.UpdateOptions.AssignedValues := [uvEDelete,uvEInsert,uvEUpdate,uvCountUpdatedRecords,uvCheckRequired,uvCheckReadOnly,uvCheckUpdatable];
+  Result.Connection := FConexao;
+  Result.Open(pSQL);
+end;
+
+constructor TFenixORM<T>.create(const pConexao: TFDConnection);
+begin
+  FConexao := pConexao;
+
+  var lRTTI :=  TFenixRTTI<T>.Create(FClasse);
+  try
+    lRTTI.PrimaryKey(FPrimarykey);
+    lRTTI.TableName(FNomeTabela);
+  finally
+    lRTTI.Free;
+  end;
+end;
+
+function TFenixORM<T>.DataSource(pDataSource: TDataSource): TFenixORM<T>;
+begin
+  Result := Self;
+  pDataSource.DataSet := Find();
+end;
+
+function TFenixORM<T>.Delete(aValue: T): Boolean;
+begin
+  var lFenixSQL := TFenixSQL<T>.Create(TObject(aValue));
+  try
+    Result := ExecutarQueryParametrizada(lFenixSQL.Delete());
+  finally
+    lFenixSQL.free();
+  end;
+end;
+
+destructor TFenixORM<T>.Destroy;
+begin
+  inherited;
+end;
+
+function TFenixORM<T>.ExecutarQuery(const pSQL: string): Boolean;
+begin
+ var lQuery := TFDQuery.Create(nil);
+  try
+    lQuery.Connection := FConexao;
+    Result := lQuery.ExecSQL(pSQL) > 0;
+    if not FTransacaoExplicita then
+      FConexao.CommitRetaining;
+  finally
+    lQuery.Free();
+  end;
+end;
+
+function TFenixORM<T>.ExecutarQueryParametrizada(const AResult: TSQLResult): Boolean;
+begin
+  var lQuery := TFDQuery.Create(nil);
+  try
+    lQuery.Connection := FConexao;
+    lQuery.SQL.Text := AResult.SQL;
+
+    for var lParam in AResult.Params do
+    begin
+      var lNomeParam := lParam.Nome;
+      if lNomeParam.StartsWith(':') then
+        lNomeParam := Copy(lNomeParam, 2, Length(lNomeParam) - 1);
+
+      if lParam.IsNull then
+      begin
+        case lParam.TipoKind of
+          tkInteger:
+          begin
+            lQuery.ParamByName(lNomeParam).DataType := ftInteger;
+            lQuery.ParamByName(lNomeParam).Clear;
+          end;
+          tkInt64:
+          begin
+            lQuery.ParamByName(lNomeParam).DataType := ftLargeint;
+            lQuery.ParamByName(lNomeParam).Clear;
+          end;
+          tkEnumeration:
+          begin
+            lQuery.ParamByName(lNomeParam).DataType := ftBoolean;
+            lQuery.ParamByName(lNomeParam).Clear;
+          end;
+          tkFloat:
+          begin
+            if lParam.TipoNome = 'TDate' then
+            begin
+              lQuery.ParamByName(lNomeParam).DataType := ftDate;
+              lQuery.ParamByName(lNomeParam).Clear;
+            end
+            else if lParam.TipoNome = 'TDateTime' then
+            begin
+              lQuery.ParamByName(lNomeParam).DataType := ftDateTime;
+              lQuery.ParamByName(lNomeParam).Clear;
+            end
+            else if lParam.TipoNome = 'TTime' then
+            begin
+              lQuery.ParamByName(lNomeParam).DataType := ftTime;
+              lQuery.ParamByName(lNomeParam).Clear;
+            end
+            else
+            begin
+              lQuery.ParamByName(lNomeParam).DataType := ftCurrency;
+              lQuery.ParamByName(lNomeParam).Clear;
+            end;
+          end;
+        else
+          begin
+            lQuery.ParamByName(lNomeParam).DataType := ftString;
+            lQuery.ParamByName(lNomeParam).Clear;
+          end;
+        end;
+      end
+      else
+      begin
+        case lParam.TipoKind of
+          tkInteger:
+            lQuery.ParamByName(lNomeParam).AsInteger := lParam.Valor.AsInteger;
+          tkInt64:
+            lQuery.ParamByName(lNomeParam).AsLargeInt := lParam.Valor.AsInt64;
+          tkEnumeration:
+            lQuery.ParamByName(lNomeParam).AsBoolean := lParam.Valor.AsBoolean;
+          tkFloat:
+          begin
+            if lParam.TipoNome = 'TDate' then
+              lQuery.ParamByName(lNomeParam).AsDate := lParam.Valor.AsVariant
+            else if lParam.TipoNome = 'TDateTime' then
+              lQuery.ParamByName(lNomeParam).AsDateTime := lParam.Valor.AsVariant
+            else if lParam.TipoNome = 'TTime' then
+              lQuery.ParamByName(lNomeParam).AsTime := lParam.Valor.AsVariant
+            else
+              lQuery.ParamByName(lNomeParam).AsCurrency := lParam.Valor.AsCurrency;
+          end;
+        else
+          lQuery.ParamByName(lNomeParam).AsString := lParam.Valor.AsString;
+        end;
+      end;
+    end;
+
+    lQuery.ExecSQL;
+    Result := lQuery.RowsAffected > 0;
+    if not FTransacaoExplicita then
+      FConexao.CommitRetaining;
+  finally
+    lQuery.Free;
+  end;
+end;
+
+procedure TFenixORM<T>.BeginTransaction;
+begin
+  FConexao.StartTransaction;
+  FTransacaoExplicita := True;
+end;
+
+procedure TFenixORM<T>.Commit;
+begin
+  FConexao.Commit;
+  FTransacaoExplicita := False;
+end;
+
+procedure TFenixORM<T>.Rollback;
+begin
+  if FConexao.InTransaction then
+  begin
+    FConexao.Rollback;
+    FTransacaoExplicita := False;
+  end;
+end;
+
+procedure TFenixORM<T>.Find(pClasse: T; const pSQL: string);
+begin
+  if FUsarWhere then
+  begin
+    var lFenixSQL := TFenixSQL<T>.Create(nil);
+    try
+      var lSQL := lFenixSQL.Select().Fields('*').Generate();
+      var lQuery := TFDQuery.Create(nil);
+      try
+        lQuery.Connection := FConexao;
+        lQuery.SQL.Text := lSQL;
+        AplicarWhereParametrizado(lQuery);
+        lQuery.Open;
+        TFenixRTTI<T>.SerializarObjeto(lQuery, pClasse);
+      finally
+        lQuery.Free;
+      end;
+    finally
+      lFenixSQL.Free;
+      LimparWhere;
+    end;
+  end
+  else
+  begin
+    var lQuery: TFDQuery := nil;
+    var lFenixSQL := TFenixSQL<T>.Create(nil);
+    try
+      var lSQL: string;
+      lSQL := lFenixSQL.Select().Fields('*').Where('(1=1) ').Generate();
+
+      lSQL := lSQL + pSQL;
+
+      lQuery := Consultar(lSQL);
+      TFenixRTTI<T>.SerializarObjeto(lQuery, pClasse);
+    finally
+      lQuery.Free;
+      lFenixSQL.Free;
+    end;
+  end;
+end;
+
+function TFenixORM<T>.Find(const pSQL: string): TFDQuery;
+begin
+  Result := Consultar(StringReplace(UpperCase(pSQL), '%S', EmptyStr, [rfReplaceAll]));
+end;
+
+function TFenixORM<T>.Find: TFDQuery;
+begin
+  var lSQL: string;
+  var lFenixSQL:= TFenixSQL<T>.Create(nil);
+  try
+   // TFenixSQL<T>.New(nil).Select(lSQL);
+    lSQL := lFenixSQL.Select().Fields('*').Generate();
+    Result := Consultar(lSQL);
+  finally
+    lFenixSQL.Free;
+  end;
+end;
+
+procedure TFenixORM<T>.Find(const pIdentificador: Integer; aValue: T);
+begin
+  var lQuery: TFDQuery := nil;
+  var lSQL := TFenixSQL<T>.Create(aValue);
+  var lConsulta: string;
+  try
+    lSQL.SelectId(lConsulta);
+    lQuery := Consultar(Format(lConsulta, [pIdentificador]));
+    TFenixRTTI<T>.SerializarObjeto(lQuery, aValue);
+  finally
+    lSQL.Free;
+    lQuery.Free;
+  end;
+end;
+
+function TFenixORM<T>.Insert(aValue: T): Boolean;
+begin
+  FClasse := aValue;
+  var lFenixSQL := TFenixSQL<T>.Create(FClasse);
+  try
+    Result := ExecutarQueryParametrizada(lFenixSQL.Insert());
+  finally
+    lFenixSQL.free();
+  end;
+end;
+
+function TFenixORM<T>.LastId: Integer;
+begin
+  var lSQL: string;
+  var lFenixSQL := TFenixSQL<T>.Create(FClasse);
+
+  try
+    lSQL := lFenixSQL.LastID();
+
+    var lQuery := Consultar(lSQL);
+    try
+      Result := lQuery.FieldByName(FPrimarykey).AsInteger;
+    finally
+      lQuery.Free();
+    end;
+  finally
+    lFenixSQL.Free;
+  end;
+end;
+
+function TFenixORM<T>.RegistroExiste(const pOID: string): Integer;
+begin
+  var lSQL :=      'SELECT'
+    + sLineBreak + '  ID'
+    + sLineBreak + 'FROM'
+    + sLineBreak + '  ' + FNomeTabela
+    + sLineBreak + 'WHERE'
+    + sLineBreak + '  (OID = :OID)';
+
+  var lQuery := TFDQuery.Create(nil);
+  try
+    lQuery.Connection := FConexao;
+    lQuery.SQL.Text := lSQL;
+    lQuery.ParamByName('OID').AsString := pOID;
+    lQuery.Open();
+
+    if lQuery.IsEmpty then
+      Result := 0
+    else
+      Result := lQuery.FieldByName('ID').AsInteger;
+  finally
+    lQuery.Free;
+  end;
+
+end;
+
+function TFenixORM<T>.Update(aValue: T): Boolean;
+begin
+  var lFenixSQL := TFenixSQL<T>.Create(TObject(aValue));
+  try
+    Result := ExecutarQueryParametrizada(lFenixSQL.Update());
+  finally
+    lFenixSQL.free();
+  end;
+end;
+
+procedure TFenixORM<T>.Find(const pSQL: string; pClasse: T);
+begin
+  if FUsarWhere then
+  begin
+    var lFenixSQL := TFenixSQL<T>.Create(nil);
+    try
+      var lSQL := lFenixSQL.Select().Fields('*').Generate();
+      var lQuery := TFDQuery.Create(nil);
+      try
+        lQuery.Connection := FConexao;
+        lQuery.SQL.Text := lSQL;
+        AplicarWhereParametrizado(lQuery);
+        lQuery.Open;
+        TFenixRTTI<T>.SerializarObjeto(lQuery, pClasse);
+      finally
+        lQuery.Free;
+      end;
+    finally
+      lFenixSQL.Free;
+      LimparWhere;
+    end;
+  end
+  else
+  begin
+    var lQuery: TFDQuery := nil;
+    var lFenixSQL := TFenixSQL<T>.Create(nil);
+    try
+      var lSQL: string;
+      var lTermo: string := Copy(pSQL,0,6);
+      if not lTermo.Contains('SELECT') then
+      begin
+        lSQL := lFenixSQL.Select().Fields('*').Where('(1=1) ').Generate();
+      end;
+
+      lSQL := lSQL + pSQL;
+
+      lQuery := Consultar(lSQL);
+      TFenixRTTI<T>.SerializarObjeto(lQuery, pClasse);
+    finally
+      lQuery.Free;
+      lFenixSQL.Free;
+    end;
+  end;
+end;
+
+function TFenixORM<T>.Count(const AFiltro: string): Integer;
+begin
+  var lSQL := 'SELECT COUNT(*) AS QTD FROM ' + FNomeTabela;
+
+  if AFiltro.Trim <> '' then
+    lSQL := lSQL + ' WHERE ' + AFiltro;
+
+  var lQuery := TFDQuery.Create(nil);
+  try
+    lQuery.Connection := FConexao;
+    lQuery.Open(lSQL);
+
+    if lQuery.IsEmpty then
+      Result := 0
+    else
+      Result := lQuery.FieldByName('QTD').AsInteger;
+  finally
+    lQuery.Free;
+  end;
+end;
+
+function TFenixORM<T>.FindAll(const AFiltro: string): TObjectList<T>;
+begin
+  Result := TObjectList<T>.Create(True);
+
+  if FUsarWhere then
+  begin
+    var lFenixSQL := TFenixSQL<T>.Create(nil);
+    try
+      var lSQL := lFenixSQL.Select().Fields('*').Generate();
+      var lQuery := TFDQuery.Create(nil);
+      try
+        lQuery.Connection := FConexao;
+        lQuery.SQL.Text := lSQL;
+        AplicarWhereParametrizado(lQuery);
+        lQuery.Open;
+
+        while not lQuery.Eof do
+        begin
+          var lContexto: TRttiContext;
+          var lTipo := lContexto.GetType(T.ClassInfo);
+          var lMetaClass := lTipo.AsInstance.MetaclassType;
+          var lInstancia := T(lMetaClass.Create);
+          TFenixRTTI<T>.SerializarObjeto(lQuery, lInstancia);
+          Result.Add(lInstancia);
+          lQuery.Next;
+        end;
+      finally
+        lQuery.Free;
+      end;
+    finally
+      lFenixSQL.Free;
+      LimparWhere;
+    end;
+  end
+  else
+  begin
+    var lFenixSQL := TFenixSQL<T>.Create(nil);
+    try
+      var lSQL: string;
+
+      if AFiltro.Trim <> '' then
+        lSQL := lFenixSQL.Select().Fields('*').Where(AFiltro).Generate()
+      else
+        lSQL := lFenixSQL.Select().Fields('*').Generate();
+
+      var lQuery := Consultar(lSQL);
+      try
+        while not lQuery.Eof do
+        begin
+          var lContexto: TRttiContext;
+          var lTipo := lContexto.GetType(T.ClassInfo);
+          var lMetaClass := lTipo.AsInstance.MetaclassType;
+          var lInstancia := T(lMetaClass.Create);
+          TFenixRTTI<T>.SerializarObjeto(lQuery, lInstancia);
+          Result.Add(lInstancia);
+          lQuery.Next;
+        end;
+      finally
+        lQuery.Free;
+      end;
+    finally
+      lFenixSQL.Free;
+    end;
+  end;
+end;
+
+function TFenixORM<T>.Where(const ACampo: string; const AValor: TValue): TFenixORM<T>;
+begin
+  Result := Self;
+  FWhereCampo := ACampo;
+  FWhereValor := AValor;
+  FUsarWhere := True;
+end;
+
+procedure TFenixORM<T>.AplicarWhereParametrizado(const AQuery: TFDQuery);
+begin
+  AQuery.SQL.Text := AQuery.SQL.Text + ' WHERE ' + FWhereCampo + ' = :PWHERE';
+
+  case FWhereValor.Kind of
+    tkInteger:
+      AQuery.ParamByName('PWHERE').AsInteger := FWhereValor.AsInteger;
+    tkInt64:
+      AQuery.ParamByName('PWHERE').AsLargeInt := FWhereValor.AsInt64;
+    tkFloat:
+      AQuery.ParamByName('PWHERE').AsCurrency := FWhereValor.AsCurrency;
+  else
+    AQuery.ParamByName('PWHERE').AsString := FWhereValor.AsString;
+  end;
+end;
+
+procedure TFenixORM<T>.LimparWhere;
+begin
+  FUsarWhere := False;
+  FWhereCampo := '';
+  FWhereValor := TValue.Empty;
+end;
+
+function TFenixORM<T>.Save(aValue: T): Boolean;
+begin
+  var lContexto: TRttiContext;
+  var lTipo := lContexto.GetType(T.ClassInfo);
+
+  for var lProp in lTipo.GetProperties do
+  begin
+    for var lAtributo in lProp.GetAttributes do
+    begin
+      if lAtributo is Pk then
+      begin
+        var lValorPk := lProp.GetValue(TObject(aValue)).AsInteger;
+        if lValorPk = 0 then
+          Result := Insert(aValue)
+        else
+          Result := Update(aValue);
+        Exit;
+      end;
+    end;
+  end;
+
+  Result := False;
+end;
+
+end.

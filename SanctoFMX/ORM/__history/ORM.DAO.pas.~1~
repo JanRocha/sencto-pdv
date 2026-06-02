@@ -1,0 +1,7 @@
+unit ORM.DAO;
+
+interface
+
+implementation
+
+end.

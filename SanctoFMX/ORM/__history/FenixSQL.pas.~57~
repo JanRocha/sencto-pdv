@@ -1,0 +1,192 @@
+unit FenixSQL;
+
+interface
+
+uses
+  FenixRTTI,
+  System.Generics.Collections;
+
+type
+  TFenixSQL<T: class> = class
+  private
+    FInstance: T;
+    FFields: string;
+    FWhere: string;
+    FOrderBy: string;
+    FGroupBy: string;
+    FJoin: string;
+    FSQL: string;
+    FFenixRTTi: TFenixRTTI<T>;
+  public
+    constructor Create(pInstance: T);
+    destructor Destroy; override;
+
+    class function New(aInstance : T): TFenixSQL<T>;
+    function Insert (): string;
+    function Update (): string;
+    function Delete (): string;
+    function Select (): TFenixSQL<T>;
+    function SelectId(var pSQL: string): TFenixSQL<T>;
+    function Fields (const pSQL: string): TFenixSQL<T>;
+    function Where (const pSQL: string): TFenixSQL<T>;
+    function OrderBy(const pSQL: string): TFenixSQL<T>;
+    function GroupBy(const pSQL: string): TFenixSQL<T>;
+    function Join (const pSQL: string): TFenixSQL<T>;
+    function LastID(): string;
+    function LastRecord(var aSQL: string): TFenixSQL<T>;
+    function Generate(): string;
+  end;
+
+implementation
+
+uses
+  System.SysUtils;
+
+{ TFenixSQL<T> }
+
+constructor TFenixSQL<T>.Create(pInstance: T);
+begin
+  FInstance := pInstance;
+  FFenixRTTi := TFenixRTTI<T>.Create(TObject(FInstance));
+end;
+
+function TFenixSQL<T>.Delete(): string;
+begin
+  Result := FFenixRTTi.Delete();
+end;
+
+destructor TFenixSQL<T>.Destroy;
+begin
+  FFenixRTTi.Free();
+  inherited;
+end;
+
+function TFenixSQL<T>.Fields(const pSQL: string): TFenixSQL<T>;
+begin
+  Result := Self;
+  if Trim(pSQL) <> '' then
+    FFields := pSQL;
+end;
+
+function TFenixSQL<T>.Generate: string;
+begin
+   var lFields: string;
+
+  if Trim(FFields).IsEmpty then
+  begin
+    FFenixRTTi.Fields(lFields);
+    Result := Format(FSQL, [lFields]);
+  end
+  else
+    Result := Format(FSQL, [FFields]);
+
+  if Trim(FJoin) <> EmptyStr then
+    FSQL := FSQL + ' ' + FJoin + ' ';
+
+  if Trim(FWhere) <> EmptyStr then
+    FSQL := FSQL + ' WHERE ' + FWhere;
+
+  if Trim(FGroupBy) <> EmptyStr then
+    FSQL := FSQL + ' GROUP BY ' + FGroupBy;
+
+  if Trim(FOrderBy) <> EmptyStr then
+    FSQL := FSQL + ' ORDER BY ' + FOrderBy;
+end;
+
+function TFenixSQL<T>.GroupBy(const pSQL: string): TFenixSQL<T>;
+begin
+
+end;
+
+function TFenixSQL<T>.Insert(): string;
+begin
+  Result := FFenixRTTi.Insert();
+end;
+
+function TFenixSQL<T>.Join(const pSQL: string): TFenixSQL<T>;
+begin
+
+end;
+
+function TFenixSQL<T>.LastID(): string;
+const
+  SQL = 'SELECT FIRST(1) %s FROM %s ORDER BY %s DESC';
+begin
+  var
+    lClassName,
+    lPK: String;
+
+  FFenixRTTi.TableName(lClassName);
+  FFenixRTTi.PrimaryKey(lPK);
+
+  Result := Format(SQL, [lPK, lClassName, lPK]);
+end;
+
+function TFenixSQL<T>.LastRecord(var aSQL: string): TFenixSQL<T>;
+begin
+
+end;
+
+class function TFenixSQL<T>.New(aInstance: T): TFenixSQL<T>;
+begin
+  Result := Self.Create(aInstance);
+end;
+
+function TFenixSQL<T>.OrderBy(const pSQL: string): TFenixSQL<T>;
+begin
+
+end;
+
+function TFenixSQL<T>.Select(): TFenixSQL<T>;
+begin
+  Result := Self;
+
+  var lNomeTabela: string;
+  FFenixRTTi.TableName(lNomeTabela);
+
+  FSQL := 'SELECT %S FROM ' + lNomeTabela;
+
+  {var lClassName, lFields: string;
+
+  FFenixRTTi.Fields(lFields);
+  FFenixRTTi.TableName(lClassName);
+
+
+  if Trim(FFields) <> EmptyStr then
+    pSQL := pSQL + ' SELECT ' + FFields
+  else
+    pSQL := pSQL + ' SELECT ' + lFields;
+  pSQL := pSQL + ' FROM ' + lClassName;
+
+  if Trim(FJoin) <> EmptyStr then
+    pSQL := pSQL + ' ' + FJoin + ' ';
+
+  if Trim(FWhere) <> EmptyStr then
+    pSQL := pSQL + ' WHERE ' + FWhere;
+
+  if Trim(FGroupBy) <> EmptyStr then
+    pSQL := pSQL + ' GROUP BY ' + FGroupBy;
+
+  if Trim(FOrderBy) <> EmptyStr then
+    pSQL := pSQL + ' ORDER BY ' + FOrderBy;   }
+end;
+
+function TFenixSQL<T>.SelectId(var pSQL: string): TFenixSQL<T>;
+begin
+  Result := self;
+  FWhere := ' ID = %d';
+  Select(pSQL);
+end;
+
+function TFenixSQL<T>.Update(): string;
+begin
+  Result := FFenixRTTi.Update();
+end;
+
+function TFenixSQL<T>.Where(const pSQL: string): TFenixSQL<T>;
+begin
+  Result := Self;
+  FWhere := pSQL;
+end;
+
+end.

@@ -1,0 +1,445 @@
+unit FenixRTTI;
+
+interface
+
+uses
+  System.Generics.Collections,
+  Controller.Funcao,
+  RTTI.Atributos,
+  System.RTTI,
+  SysUtils,
+  Data.DB,
+  TypInfo;
+
+type
+  TFenixRTTI<T: class> = class
+  private
+    FInstance: T;
+    function EhPrimaryKey(const lprop: TRttiProperty): Boolean;
+    class function ForeingKey(const lprop: TRttiProperty): Boolean;
+    class function Ignorar(const lprop: TRttiProperty): Boolean;
+    class function NaoSerializar(const lprop: TRttiProperty): Boolean;
+  public
+    constructor Create(pInstance: T );
+    destructor Destroy; override;
+
+    function TableName(var pTableName: string): TFenixRTTI<T>;
+    function PrimaryKey(var pPrimaryKey: string): TFenixRTTI<T>;
+
+    function Fields(var pFields: string): TFenixRTTI<T>;
+    function Insert(): string;
+    function Update():string;
+    function Delete(): string;
+    class procedure SerializarObjeto(const lQuery: TDataSet; const lClasse: T);
+  end;
+
+implementation
+
+{ TFenixRTTI<T> }
+
+constructor TFenixRTTI<T>.Create(pInstance: T);
+begin
+  FInstance := pInstance;
+end;
+
+function TFenixRTTI<T>.Delete: string;
+begin
+  var Prop: TRttiProperty;
+  var lClasse : TObject;
+  lClasse := TObject(FInstance);
+
+  try
+    var Contexto: TRttiContext;
+    var Tipo := Contexto.GetType(T.ClassInfo);
+
+    var lWhere: string;
+
+    for Prop in Tipo.GetProperties do
+    begin
+      if EhPrimaryKey(prop) then
+      begin
+        lWhere := ' WHERE ' + Prop.Name + ' = ' + IntToStr(Prop.GetValue(lClasse).AsInt64);
+        Break;
+      end;
+    end;
+
+    var lTableName: string;
+    TableName(lTableName);
+
+    Result := 'DELETE ' + lTableName + lWhere;
+
+  except on E: Exception do
+    begin
+      TControllerFuncao.GravarLog(E.Message + Prop.PropertyType.Name);
+    end;
+  end;
+end;
+
+destructor TFenixRTTI<T>.Destroy;
+begin
+//  FInstance.free;
+  inherited;
+end;
+
+function TFenixRTTI<T>.EhPrimaryKey(const lprop: TRttiProperty): Boolean;
+begin
+  Result := False;
+  for var atributo in lprop.GetAttributes do
+  begin
+    if atributo is Pk then
+    begin
+      Result := True;
+      Break;
+    end;
+  end;
+end;
+
+function TFenixRTTI<T>.Fields(var pFields: string): TFenixRTTI<T>;
+begin
+  var lContexto: TRttiContext;
+  var lTipo: TRttiType;
+  var lPropriedade: TRttiProperty;
+  var Informacao: PTypeInfo;
+
+  Result := Self;
+  Informacao := System.TypeInfo(T);
+  lContexto := TRttiContext.Create;
+  try
+    lTipo := lContexto.GetType(Informacao);
+    for lPropriedade in lTipo.GetProperties do
+    begin
+      if not NaoSerializar(lPropriedade) then
+        pFields := pFields + lPropriedade.Name + ', ';
+    end;
+  finally
+    pFields := Copy(pFields, 0, Length(pFields) - 2) + ' ';
+    lContexto.Free;
+  end;
+end;
+
+class function TFenixRTTI<T>.ForeingKey(const lprop: TRttiProperty): Boolean;
+begin
+  Result := False;
+  for var atributo in lprop.GetAttributes do
+  begin
+    if atributo is Fk then
+    begin
+      Result := True;
+      Break;
+    end;
+  end;
+end;
+
+class function TFenixRTTI<T>.Ignorar(const lprop: TRttiProperty): Boolean;
+begin
+  Result := False;
+  for var atributo in lprop.GetAttributes do
+  begin
+    if (atributo is Ignore) or (atributo is NoSerialize) then
+    begin
+      Result := True;
+      Break;
+    end;
+  end;
+end;
+
+function TFenixRTTI<T>.Insert: string;
+begin
+  var Prop: TRttiProperty;
+  var lClasse : TObject;
+  lClasse := TObject(FInstance); // GetNewID(pClasse);
+
+  try
+    var Contexto: TRttiContext;
+    var Tipo := Contexto.GetType(T.ClassInfo);
+    var lCampos := '';
+    var lValor := '';
+
+    for Prop in Tipo.GetProperties do
+    begin
+      if EhPrimaryKey(prop) then
+        Continue;
+
+      if Ignorar(prop) then
+        Continue;
+
+      lCampos := lCampos + Prop.Name + ',';
+
+      case Prop.PropertyType.TypeKind of
+        tkInteger,
+        tkInt64:
+        begin
+          if (Prop.GetValue(lClasse).AsInt64 <= 0) and ForeingKey(prop) then
+            lValor := lValor  + 'Null' +  ','
+          else
+            lValor := lValor + IntToStr(Prop.GetValue(lClasse).AsInt64) + ',';
+        end;
+        tkEnumeration:
+        begin
+          if Prop.PropertyType.Name = 'Boolean' then
+          begin
+             if Prop.GetValue(lClasse).AsBoolean then
+              lValor := lValor  + 'True' +  ','
+            else
+              lValor := lValor  + 'False' +  ',';
+          end;
+        end;
+        tkFloat:
+        begin
+          if Prop.PropertyType.Name = 'TDate' then
+          begin
+            if FormatDateTime('dd.mm.yyyy',Prop.GetValue(lClasse).AsVariant) = '30.12.1899' then
+            begin
+              lValor := lValor + 'null'+ ',';
+            end
+            else
+              lValor := lValor + QuotedStr(FormatDateTime('dd.mm.yyyy', Prop.GetValue(lClasse).AsVariant))  + ',';
+          end
+          else if(Prop.PropertyType.Name = 'TDateTime') then
+          begin
+            if FormatDateTime('dd.mm.yyyy hh:mm:ss',Prop.GetValue(lClasse).AsVariant) = '30.12.1899 00:00:00' then
+            begin
+              lValor := lValor + 'null'+ ',';
+            end
+            else
+              lValor := lValor + QuotedStr(FormatDateTime('dd.mm.yyyy hh:mm:ss', Prop.GetValue(lClasse).AsVariant)) + ',';
+          end
+          else if(Prop.PropertyType.Name = 'TTime') then
+          begin
+            if FormatDateTime('hh:mm:ss',Prop.GetValue(lClasse).AsVariant) = '00:00:00' then
+            begin
+              lValor := lValor + 'null'+ ',';
+            end
+            else
+              lValor := lValor + QuotedStr(FormatDateTime('hh:mm:ss', Prop.GetValue(lClasse).AsVariant)) + ',';
+          end
+          else
+            lValor := lValor +StringReplace(CurrToStr(Prop.GetValue(lClasse).AsCurrency),',','.',[rfReplaceAll]) + ',';
+        end
+        else
+        begin
+          lValor := lValor + QuotedStr(Prop.GetValue(lClasse).AsString)  + ',';
+        end;
+      end;
+    end;
+
+    lCampos := Copy(lCampos, 0, Length(lCampos)-1);
+    lValor := Copy(lValor, 0, Length(lValor)-1);
+
+    var lTableName: string;
+    TableName(lTableName);
+
+    Result := 'INSERT INTO ' + lTableName + ' (' + lCampos + ') VALUES (' + lValor + ')';
+
+  except on E: Exception do
+    begin
+      TControllerFuncao.GravarLog(E.Message + Prop.PropertyType.Name);
+    end;
+  end;
+end;
+
+function TFenixRTTI<T>.PrimaryKey(var pPrimaryKey: string): TFenixRTTI<T>;
+begin
+  Result := self;
+  var lContexto: TRttiContext;
+  var lTipo: TRttiType;
+  var lPropriedade: TRttiProperty;
+    
+  Result := Self;
+  lContexto := TRttiContext.Create;
+  try
+    lTipo := lContexto.GetType(T.ClassInfo);
+    for lPropriedade in lTipo.GetProperties do
+    begin
+      for var atributo in lPropriedade.GetAttributes do
+        if (atributo is Pk) then
+        begin
+          pPrimaryKey := lPropriedade.Name;
+          break;
+        end;
+    end;
+  finally
+    lContexto.Free;
+  end;
+end;
+
+class procedure TFenixRTTI<T>.SerializarObjeto(const lQuery: TDataSet; const lClasse: T);
+var
+  Contexto: TRttiContext;
+  Tipo    : TRttiType;
+  Prop    : TRttiProperty;
+begin
+  Tipo := Contexto.GetType(Tobject(lClasse).ClassInfo);
+  for Prop in Tipo.GetProperties do
+  begin
+    if Ignorar(prop) then
+        Continue;
+
+    case Prop.PropertyType.TypeKind of
+      tkInt64,
+      tkInteger:
+      begin
+         if Assigned(lQuery.FindField(prop.Name)) then
+          Prop.SetValue(Tobject(lClasse), lQuery.FieldByName(prop.Name).AsInteger);
+      end;
+      tkEnumeration:
+        if Prop.PropertyType.Name = 'Boolean' then
+        begin
+          Prop.SetValue(Tobject(lClasse), lQuery.FieldByName(prop.Name).AsBoolean);
+        end;
+
+      tkUString,
+      tkLString,
+      tkString,
+      tkWString:
+        if Assigned(lQuery.FindField(prop.Name)) then
+          Prop.SetValue(Tobject(lClasse), lQuery.FieldByName(prop.Name).AsString);
+        tkFloat:
+        begin
+          if Assigned(lQuery.FindField(prop.Name)) then
+            if (Prop.PropertyType.Name = 'TDate') or (Prop.PropertyType.Name = 'TDateTime') then
+              Prop.SetValue(Tobject(lClasse), lQuery.FieldByName(prop.Name).AsDateTime)
+            else
+              Prop.SetValue(Tobject(lClasse), lQuery.FieldByName(prop.Name).AsCurrency)
+        end;
+    end;
+  end;
+end;
+
+class function TFenixRTTI<T>.NaoSerializar(const lprop: TRttiProperty): Boolean;
+begin
+  Result := False;
+  for var atributo in lprop.GetAttributes do
+  begin
+    if atributo is NoSerialize then
+    begin
+      Result := True;
+      Break;
+    end;
+  end;
+end;
+
+function TFenixRTTI<T>.TableName(var pTableName: string): TFenixRTTI<T>;
+begin
+  Result := self;
+
+  var lTipo: PTypeInfo;
+  var lContexto: TRttiContext;
+  var lTttiTipo: TRttiType;
+
+  lTipo := System.TypeInfo(T);
+  lContexto := TRttiContext.Create;
+  try
+    lTttiTipo := lContexto.GetType(lTipo);
+
+    for var atributo in lTttiTipo.GetAttributes do
+      if atributo is Tabela then
+        pTableName := (atributo as Tabela).Name;
+  finally
+    lContexto.Free;
+  end;
+end;
+
+function TFenixRTTI<T>.Update: string;
+begin
+  var Prop: TRttiProperty;
+  var lClasse : TObject;
+  lClasse := TObject(FInstance); // GetNewID(pClasse);
+
+  try
+    var Contexto: TRttiContext;
+    var Tipo := Contexto.GetType(T.ClassInfo);
+    var lCampos := '';
+    var lValor := '';
+    var lWhere: string;
+
+    for Prop in Tipo.GetProperties do
+    begin
+      if EhPrimaryKey(prop) then
+      begin
+        lWhere := ' WHERE ' + Prop.Name + ' = ' + IntToStr(Prop.GetValue(lClasse).AsInt64);
+        Continue;
+      end;
+
+      if Ignorar(prop) then
+        Continue;
+
+      case Prop.PropertyType.TypeKind of
+        tkInteger,
+        tkInt64:
+        begin
+          if (Prop.GetValue(lClasse).AsInt64 <= 0) and (ForeingKey(prop)) then
+            lValor := lValor + Prop.Name + ' = ' + 'Null' +  ','
+          else
+            lValor := lValor + Prop.Name + ' = ' + IntToStr(Prop.GetValue(lClasse).AsInt64) + ',';
+        end;
+        tkEnumeration:
+        begin
+          if Prop.PropertyType.Name = 'Boolean' then
+          begin
+             if Prop.GetValue(lClasse).AsBoolean then
+              lValor := lValor  + Prop.Name +  '= True' +  ','
+            else
+              lValor := lValor  + Prop.Name + '= False' +  ',';
+          end
+          else
+            lValor := lValor + Prop.Name + ' = ' + IntToStr(Prop.GetValue(lClasse).AsInt64) + ',';
+        end;
+        tkFloat:
+        begin
+          if Prop.PropertyType.Name = 'TDate' then
+          begin
+            if FormatDateTime('dd.mm.yyyy',Prop.GetValue(lClasse).AsVariant) = '30.12.1899' then
+            begin
+              lValor := lValor + Prop.Name + ' = ' + 'null'+ ',';
+            end
+            else
+              lValor := lValor + Prop.Name + ' = ' + QuotedStr(FormatDateTime('dd.mm.yyyy', Prop.GetValue(lClasse).AsVariant))  + ',';
+          end
+          else if(Prop.PropertyType.Name = 'TDateTime') then
+          begin
+            if FormatDateTime('dd.mm.yyyy hh:mm:ss',Prop.GetValue(lClasse).AsVariant) = '30.12.1899 00:00:00' then
+            begin
+              lValor := lValor + Prop.Name + ' = ' + 'null'+ ',';
+            end
+            else
+              lValor := lValor +  Prop.Name + ' = ' + QuotedStr(FormatDateTime('dd.mm.yyyy hh:mm:ss', Prop.GetValue(lClasse).AsVariant)) + ',';
+          end
+          else if(Prop.PropertyType.Name = 'TTime') then
+          begin
+            if FormatDateTime('hh:mm:ss',Prop.GetValue(lClasse).AsVariant) = '00:00:00' then
+            begin
+              lValor := lValor + Prop.Name + ' = ' + 'null'+ ',';
+            end
+            else
+              lValor := lValor + Prop.Name + ' = ' + QuotedStr(FormatDateTime('hh:mm:ss', Prop.GetValue(lClasse).AsVariant)) + ',';
+          end
+          else
+            lValor := lValor + Prop.Name + ' = ' +  StringReplace(CurrToStr(Prop.GetValue(lClasse).AsCurrency),',','.',[rfReplaceAll]) + ',';
+        end
+        else
+        begin
+          lValor := lValor + Prop.Name + ' = ' + QuotedStr(Prop.GetValue(lClasse).AsString)  + ',';
+        end;
+      end;
+    end;
+
+    lCampos := Copy(lCampos, 0, Length(lCampos)-1);
+    lValor := Copy(lValor, 0, Length(lValor)-1);
+
+    var lTableName: string;
+    TableName(lTableName);
+
+    var lPrimaryKey: string;
+    PrimaryKey(lPrimaryKey);
+
+    Result := 'UPDATE ' + lTableName + ' SET ' +  lValor + lWhere
+
+  except on E: Exception do
+    begin
+      TControllerFuncao.GravarLog(E.Message + Prop.PropertyType.Name);
+    end;
+  end;
+end;
+
+end.
