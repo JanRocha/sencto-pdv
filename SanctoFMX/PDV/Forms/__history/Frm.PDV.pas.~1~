@@ -1,0 +1,1238 @@
+unit Frm.PDV;
+
+interface
+
+uses
+  System.SysUtils,
+  System.Types,
+  System.UITypes,
+  System.Classes,
+  System.Math,
+  System.Generics.Collections,
+  FMX.Types,
+  FMX.Forms,
+  FMX.Controls,
+  FMX.StdCtrls,
+  FMX.Layouts,
+  FMX.Objects,
+  FMX.Effects,
+  FMX.Ani,
+  FMX.Edit,
+  FMX.ListBox,
+  FMX.Controls.Presentation,
+  FMX.Graphics,
+  FMX.DialogService,
+  Utils.Theme,
+  Model.Entidade.Categoria,
+  Model.Entidade.Produto,
+  Model.Entidade.VendaItem,
+  Controller.Venda;
+
+type
+  /// <summary>
+  /// Tela principal de PDV para Parque Infantil.
+  /// O layout visual (3 secoes: menu lateral, area central, painel de venda)
+  /// e definido no Frm.PDV.fmx (editavel no Designer).
+  /// Esta unit apenas:
+  ///   - Popula os chips de categoria (ScrollChips)
+  ///   - Renderiza os cards de produto (FlowProdutos) com base nos dados
+  ///   - Renderiza os itens do carrinho (ScrollItens)
+  ///   - Trata eventos (clique, busca, desconto, finalizacao, atalhos)
+  /// </summary>
+  TFrmPDV = class(TForm)
+    { ===== Componentes publicados do .fmx ===== }
+    RectRoot: TRectangle;
+
+    { Secao 1 - Menu lateral }
+    LayoutSidebar: TLayout;
+    RectSidebarBg: TRectangle;
+    RectSidebarBorder: TRectangle;
+    LayoutLogo: TLayout;
+    RectLogoIcon: TRectangle;
+    lblLogoIcon: TLabel;
+    lblLogoTitulo: TLabel;
+    lblLogoSub: TLabel;
+    lblMenuCap: TLabel;
+    LayoutMenu: TLayout;
+    ItemVenda: TRectangle;
+    lblIconVenda: TLabel;
+    lblTextVenda: TLabel;
+    ItemProdutos: TRectangle;
+    lblIconProdutos: TLabel;
+    lblTextProdutos: TLabel;
+    ItemClientes: TRectangle;
+    lblIconClientes: TLabel;
+    lblTextClientes: TLabel;
+    ItemIngressos: TRectangle;
+    lblIconIngressos: TLabel;
+    lblTextIngressos: TLabel;
+    ItemCaixa: TRectangle;
+    lblIconCaixa: TLabel;
+    lblTextCaixa: TLabel;
+    ItemRelatorios: TRectangle;
+    lblIconRelatorios: TLabel;
+    lblTextRelatorios: TLabel;
+    ItemConfig: TRectangle;
+    lblIconConfig: TLabel;
+    lblTextConfig: TLabel;
+    LayoutOperador: TLayout;
+    RectOperadorSep: TRectangle;
+    lblOperadorAvatar: TLabel;
+    lblOperadorNome: TLabel;
+    lblOperadorPapel: TLabel;
+    BtnLogout: TRectangle;
+    lblLogout: TLabel;
+
+    { Secao 2 - Area central }
+    LayoutCentral: TLayout;
+    LayoutBusca: TLayout;
+    RectBusca: TRectangle;
+    lblBuscaIcon: TLabel;
+    lblAtalhoF2: TLabel;
+    EdtBusca: TEdit;
+    lblProdutosTitulo: TLabel;
+    LayoutChips: TLayout;
+    ScrollChips: THorzScrollBox;
+    LayoutAcoes: TLayout;
+    RectAcoesBar: TRectangle;
+    lblAcoesInfo: TLabel;
+    lblVersao: TLabel;
+    ScrollProdutos: TVertScrollBox;
+    FlowProdutos: TFlowLayout;
+
+    { Secao 3 - Painel de venda }
+    LayoutVenda: TLayout;
+    RectVendaBg: TRectangle;
+    RectVendaBorder: TRectangle;
+    LayoutVendaHeader: TLayout;
+    lblVendaTitulo: TLabel;
+    LayoutVendaFooter: TLayout;
+    LayoutBotoesSec: TLayout;
+    BtnCancelar: TRectangle;
+    lblCancelar: TLabel;
+    BtnSalvar: TRectangle;
+    lblSalvar: TLabel;
+    BtnFinalizar: TRectangle;
+    lblFinalizar: TLabel;
+    RowTotal: TLayout;
+    lblTotalCap: TLabel;
+    lblTotalVal: TLabel;
+    RowDesconto: TLayout;
+    lblDescontoCap: TLabel;
+    lblDescontoVal: TLabel;
+    RowSubtotal: TLayout;
+    lblSubtotalCap: TLabel;
+    lblSubtotalVal: TLabel;
+    RectDesconto: TRectangle;
+    EdtDesconto: TEdit;
+    lblDescontoPerc: TLabel;
+    ScrollItens: TVertScrollBox;
+
+    { ===== Eventos publicados ===== }
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure MenuItemClick(Sender: TObject);
+    procedure BtnLogoutClick(Sender: TObject);
+    procedure BtnFinalizarClick(Sender: TObject);
+    procedure BtnCancelarClick(Sender: TObject);
+    procedure BtnSalvarClick(Sender: TObject);
+    procedure EdtBuscaChange(Sender: TObject);
+    procedure EdtDescontoChange(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char;
+      Shift: TShiftState);
+  private
+    { Colaborador logado }
+    FColaboradorId: Integer;
+    FColaboradorNome: string;
+    FColaboradorPapel: string;
+    FCaixaId: Integer;
+
+    { Controller }
+    FControllerVenda: TControllerVenda;
+
+    { Dados Mock }
+    FCategorias: TObjectList<TCategoria>;
+    FProdutos: TObjectList<TProduto>;
+    FCategoriaSelecionadaId: Integer;
+
+    { Itens de menu (para destaque de selecao) }
+    FMenuItens: TArray<TRectangle>;
+
+    { --- Chips de categoria --- }
+    procedure RenderizarChips;
+    function CriarChip(const ATexto: string; ATag: Integer): TRectangle;
+    procedure ChipClick(Sender: TObject);
+    procedure AtualizarChipAtivo;
+
+    { --- Produtos --- }
+    procedure RenderizarProdutos;
+    function CriarCardProduto(AProduto: TProduto): TRectangle;
+    procedure CardMouseEnter(Sender: TObject);
+    procedure CardMouseLeave(Sender: TObject);
+    procedure ProdutoCardClick(Sender: TObject);
+
+    { --- Carrinho --- }
+    procedure AtualizarCarrinho;
+    procedure RenderizarItensCarrinho;
+    procedure AtualizarTotais;
+    procedure BtnMaisClick(Sender: TObject);
+    procedure BtnMenosClick(Sender: TObject);
+    procedure BtnRemoverClick(Sender: TObject);
+
+    { --- Menu lateral --- }
+    procedure DestacarMenu(ATag: Integer);
+
+    { --- Pagamento --- }
+    procedure ExibirDialogPagamento;
+
+    { --- Helpers --- }
+    procedure PopularDadosMock;
+    procedure ConfigurarOperador;
+    function FormatarMoeda(AValor: Currency): string;
+    function GetProdutoPorId(AId: Integer): TProduto;
+
+    procedure SetColaboradorNome(const AValue: string);
+    procedure SetColaboradorPapel(const AValue: string);
+    procedure SetCaixaId(const AValue: Integer);
+  public
+    constructor Create(AOwner: TComponent; AColaboradorId: Integer;
+      const AColaboradorNome, AColaboradorPapel: string;
+      ACaixaId: Integer = 1); reintroduce; overload;
+
+    property ColaboradorId: Integer read FColaboradorId write FColaboradorId;
+    property ColaboradorNome: string read FColaboradorNome write SetColaboradorNome;
+    property ColaboradorPapel: string read FColaboradorPapel write SetColaboradorPapel;
+    property CaixaId: Integer read FCaixaId write SetCaixaId;
+  end;
+
+var
+  FrmPDV: TFrmPDV;
+
+implementation
+
+{$R *.fmx}
+
+type
+  /// Helper para acessar Scale (protegido em TControl no Delphi 10.2)
+  TControlScaleHelper = class helper for TControl
+  public
+    procedure SetEscala(AValor: Single);
+  end;
+
+procedure TControlScaleHelper.SetEscala(AValor: Single);
+begin
+  Self.Scale.X := AValor;
+  Self.Scale.Y := AValor;
+end;
+
+const
+  CARD_WIDTH  = 180;
+  CARD_HEIGHT = 220;
+  CHIP_HEIGHT = 36;
+  CHIP_SPACING = 8;
+
+{ ============================================================
+  CONSTRUTOR
+  ============================================================ }
+
+constructor TFrmPDV.Create(AOwner: TComponent; AColaboradorId: Integer;
+  const AColaboradorNome, AColaboradorPapel: string; ACaixaId: Integer);
+begin
+  FColaboradorId := AColaboradorId;
+  FColaboradorNome := AColaboradorNome;
+  FColaboradorPapel := AColaboradorPapel;
+  FCaixaId := ACaixaId;
+  inherited Create(AOwner);
+end;
+
+procedure TFrmPDV.FormCreate(Sender: TObject);
+begin
+  FCategoriaSelecionadaId := 0;
+
+  FControllerVenda := TControllerVenda.Create;
+  FCategorias := TObjectList<TCategoria>.Create(True);
+  FProdutos := TObjectList<TProduto>.Create(True);
+
+  FMenuItens := [ItemVenda, ItemProdutos, ItemClientes, ItemIngressos,
+                 ItemCaixa, ItemRelatorios, ItemConfig];
+
+  ConfigurarOperador;
+  PopularDadosMock;
+  RenderizarChips;
+  RenderizarProdutos;
+  AtualizarCarrinho;
+end;
+
+procedure TFrmPDV.FormDestroy(Sender: TObject);
+begin
+  FProdutos.Free;
+  FCategorias.Free;
+  FControllerVenda.Free;
+end;
+
+procedure TFrmPDV.ConfigurarOperador;
+begin
+  lblOperadorNome.Text := FColaboradorNome;
+  lblOperadorPapel.Text := FColaboradorPapel;
+  lblAcoesInfo.Text := Format('Caixa: %0.3d   |   Operador: %s   |   Turno: 1   |   Online',
+    [FCaixaId, FColaboradorNome]);
+end;
+
+procedure TFrmPDV.SetColaboradorNome(const AValue: string);
+begin
+  FColaboradorNome := AValue;
+  if Assigned(lblOperadorNome) then
+    lblOperadorNome.Text := AValue;
+  if Assigned(lblAcoesInfo) then
+    lblAcoesInfo.Text := Format('Caixa: %0.3d   |   Operador: %s   |   Turno: 1   |   Online',
+      [FCaixaId, FColaboradorNome]);
+end;
+
+procedure TFrmPDV.SetColaboradorPapel(const AValue: string);
+begin
+  FColaboradorPapel := AValue;
+  if Assigned(lblOperadorPapel) then
+    lblOperadorPapel.Text := AValue;
+end;
+
+procedure TFrmPDV.SetCaixaId(const AValue: Integer);
+begin
+  FCaixaId := AValue;
+  if Assigned(lblAcoesInfo) then
+    lblAcoesInfo.Text := Format('Caixa: %0.3d   |   Operador: %s   |   Turno: 1   |   Online',
+      [FCaixaId, FColaboradorNome]);
+end;
+
+{ ============================================================
+  CHIPS DE CATEGORIA
+  ============================================================ }
+
+procedure TFrmPDV.RenderizarChips;
+var
+  I: Integer;
+  LChip: TRectangle;
+  LPosX: Single;
+begin
+  ScrollChips.Content.DeleteChildren;
+  LPosX := 0;
+
+  { Chip "Todos" }
+  LChip := CriarChip('Todos', 0);
+  LChip.Parent := ScrollChips;
+  LChip.Position.X := LPosX;
+  LChip.Position.Y := 8;
+  LPosX := LPosX + LChip.Width + CHIP_SPACING;
+
+  { Chips das categorias }
+  for I := 0 to FCategorias.Count - 1 do
+  begin
+    LChip := CriarChip(FCategorias[I].Nome, FCategorias[I].Id);
+    LChip.Parent := ScrollChips;
+    LChip.Position.X := LPosX;
+    LChip.Position.Y := 8;
+    LPosX := LPosX + LChip.Width + CHIP_SPACING;
+  end;
+end;
+
+function TFrmPDV.CriarChip(const ATexto: string; ATag: Integer): TRectangle;
+var
+  LLbl: TLabel;
+begin
+  Result := TRectangle.Create(Self);
+  Result.Width := Length(ATexto) * 8 + 32;
+  Result.Height := CHIP_HEIGHT;
+  Result.XRadius := CHIP_HEIGHT / 2;
+  Result.YRadius := CHIP_HEIGHT / 2;
+  Result.Stroke.Kind := TBrushKind.None;
+  Result.Fill.Kind := TBrushKind.Solid;
+  Result.Tag := ATag;
+  Result.Cursor := crHandPoint;
+  Result.HitTest := True;
+  Result.OnClick := ChipClick;
+
+  if ATag = FCategoriaSelecionadaId then
+    Result.Fill.Color := TTheme.CorPrincipal
+  else
+    Result.Fill.Color := TTheme.CorFundoSecundario;
+
+  LLbl := TLabel.Create(Self);
+  LLbl.Parent := Result;
+  LLbl.Align := TAlignLayout.Client;
+  LLbl.Text := ATexto;
+  LLbl.StyledSettings := [];
+  LLbl.TextSettings.Font.Size := TTheme.FontNormal;
+  LLbl.TextSettings.HorzAlign := TTextAlign.Center;
+  LLbl.TextSettings.VertAlign := TTextAlign.Center;
+  LLbl.HitTest := False;
+
+  if ATag = FCategoriaSelecionadaId then
+  begin
+    LLbl.TextSettings.Font.Style := [TFontStyle.fsBold];
+    LLbl.TextSettings.FontColor := TTheme.CorTextoBranco;
+  end
+  else
+    LLbl.TextSettings.FontColor := TTheme.CorTextoSecundario;
+end;
+
+procedure TFrmPDV.ChipClick(Sender: TObject);
+begin
+  if Sender is TRectangle then
+  begin
+    FCategoriaSelecionadaId := TRectangle(Sender).Tag;
+    AtualizarChipAtivo;
+    RenderizarProdutos;
+  end;
+end;
+
+procedure TFrmPDV.AtualizarChipAtivo;
+var
+  I, J: Integer;
+  LChip: TRectangle;
+  LObj: TFmxObject;
+begin
+  for I := 0 to ScrollChips.Content.ChildrenCount - 1 do
+  begin
+    if not (ScrollChips.Content.Children[I] is TRectangle) then
+      Continue;
+    LChip := TRectangle(ScrollChips.Content.Children[I]);
+
+    if LChip.Tag = FCategoriaSelecionadaId then
+      LChip.Fill.Color := TTheme.CorPrincipal
+    else
+      LChip.Fill.Color := TTheme.CorFundoSecundario;
+
+    for J := 0 to LChip.ChildrenCount - 1 do
+    begin
+      LObj := LChip.Children[J];
+      if LObj is TLabel then
+      begin
+        if LChip.Tag = FCategoriaSelecionadaId then
+        begin
+          TLabel(LObj).TextSettings.Font.Style := [TFontStyle.fsBold];
+          TLabel(LObj).TextSettings.FontColor := TTheme.CorTextoBranco;
+        end
+        else
+        begin
+          TLabel(LObj).TextSettings.Font.Style := [];
+          TLabel(LObj).TextSettings.FontColor := TTheme.CorTextoSecundario;
+        end;
+      end;
+    end;
+  end;
+end;
+
+{ ============================================================
+  PRODUTOS (cards)
+  ============================================================ }
+
+procedure TFrmPDV.RenderizarProdutos;
+var
+  I: Integer;
+  LCard: TRectangle;
+  LBusca: string;
+  LContador: Integer;
+  LColunas: Integer;
+begin
+  FlowProdutos.BeginUpdate;
+  try
+    FlowProdutos.DeleteChildren;
+    LBusca := LowerCase(Trim(EdtBusca.Text));
+    LContador := 0;
+
+    for I := 0 to FProdutos.Count - 1 do
+    begin
+      if FProdutos[I].Situacao <> 1 then
+        Continue;
+      if (FCategoriaSelecionadaId <> 0) and
+         (FProdutos[I].Categoria_Id <> FCategoriaSelecionadaId) then
+        Continue;
+      if (LBusca <> '') and
+         (Pos(LBusca, LowerCase(FProdutos[I].Nome)) = 0) then
+        Continue;
+
+      LCard := CriarCardProduto(FProdutos[I]);
+      LCard.Parent := FlowProdutos;
+      Inc(LContador);
+    end;
+  finally
+    FlowProdutos.EndUpdate;
+  end;
+
+  { Ajusta altura do FlowLayout para o scroll }
+  LColunas := Max(1, Trunc(FlowProdutos.Width / (CARD_WIDTH + 16)));
+  FlowProdutos.Height := (Ceil(LContador / LColunas)) * (CARD_HEIGHT + 16) + 16;
+end;
+
+function TFrmPDV.CriarCardProduto(AProduto: TProduto): TRectangle;
+var
+  LRectImg: TRectangle;
+  LLblEmoji: TLabel;
+  LLblNome: TLabel;
+  LLblPreco: TLabel;
+  LShadow: TShadowEffect;
+  LBadge: TRectangle;
+  LLblBadge: TLabel;
+begin
+  Result := TRectangle.Create(Self);
+  Result.Width := CARD_WIDTH;
+  Result.Height := CARD_HEIGHT;
+  Result.XRadius := TTheme.CardRadius;
+  Result.YRadius := TTheme.CardRadius;
+  Result.Fill.Kind := TBrushKind.Solid;
+  Result.Fill.Color := TTheme.CorFundoCard;
+  Result.Stroke.Kind := TBrushKind.Solid;
+  Result.Stroke.Color := TTheme.CorBorda;
+  Result.Stroke.Thickness := 1;
+  Result.Tag := AProduto.Id;
+  Result.Cursor := crHandPoint;
+  Result.HitTest := True;
+  Result.OnClick := ProdutoCardClick;
+  Result.OnMouseEnter := CardMouseEnter;
+  Result.OnMouseLeave := CardMouseLeave;
+
+  { Sombra suave }
+  LShadow := TShadowEffect.Create(Result);
+  LShadow.Parent := Result;
+  LShadow.Distance := 3;
+  LShadow.Direction := 90;
+  LShadow.Softness := 0.3;
+  LShadow.Opacity := 0.12;
+  LShadow.ShadowColor := TAlphaColorRec.Black;
+
+  { Area da imagem (circulo com emoji) }
+  LRectImg := TRectangle.Create(Self);
+  LRectImg.Parent := Result;
+  LRectImg.Align := TAlignLayout.None;
+  LRectImg.Position.X := (CARD_WIDTH - 88) / 2;
+  LRectImg.Position.Y := 18;
+  LRectImg.Width := 88;
+  LRectImg.Height := 88;
+  LRectImg.XRadius := 44;
+  LRectImg.YRadius := 44;
+  LRectImg.Fill.Kind := TBrushKind.Solid;
+  LRectImg.Fill.Color := TTheme.CorPrincipalLight;
+  LRectImg.Stroke.Kind := TBrushKind.None;
+  LRectImg.HitTest := False;
+
+  LLblEmoji := TLabel.Create(Self);
+  LLblEmoji.Parent := LRectImg;
+  LLblEmoji.Align := TAlignLayout.Client;
+  LLblEmoji.Text := Char($D83C) + Char($DF89); // party popper default
+  LLblEmoji.StyledSettings := [];
+  LLblEmoji.TextSettings.Font.Size := 40;
+  LLblEmoji.TextSettings.HorzAlign := TTextAlign.Center;
+  LLblEmoji.TextSettings.VertAlign := TTextAlign.Center;
+  LLblEmoji.HitTest := False;
+
+  { Nome }
+  LLblNome := TLabel.Create(Self);
+  LLblNome.Parent := Result;
+  LLblNome.Align := TAlignLayout.None;
+  LLblNome.Position.X := 8;
+  LLblNome.Position.Y := 120;
+  LLblNome.Width := CARD_WIDTH - 16;
+  LLblNome.Height := 44;
+  LLblNome.Text := AProduto.Nome;
+  LLblNome.StyledSettings := [];
+  LLblNome.TextSettings.Font.Size := TTheme.FontNormal;
+  LLblNome.TextSettings.Font.Style := [TFontStyle.fsBold];
+  LLblNome.TextSettings.FontColor := TTheme.CorTexto;
+  LLblNome.TextSettings.HorzAlign := TTextAlign.Center;
+  LLblNome.TextSettings.VertAlign := TTextAlign.Center;
+  LLblNome.TextSettings.WordWrap := True;
+  LLblNome.HitTest := False;
+
+  { Preco }
+  LLblPreco := TLabel.Create(Self);
+  LLblPreco.Parent := Result;
+  LLblPreco.Align := TAlignLayout.None;
+  LLblPreco.Position.X := 8;
+  LLblPreco.Position.Y := 170;
+  LLblPreco.Width := CARD_WIDTH - 16;
+  LLblPreco.Height := 30;
+  LLblPreco.Text := FormatarMoeda(AProduto.Preco_Venda);
+  LLblPreco.StyledSettings := [];
+  LLblPreco.TextSettings.Font.Size := TTheme.FontPrice;
+  LLblPreco.TextSettings.Font.Style := [TFontStyle.fsBold];
+  LLblPreco.TextSettings.FontColor := TTheme.CorPrincipal;
+  LLblPreco.TextSettings.HorzAlign := TTextAlign.Center;
+  LLblPreco.TextSettings.VertAlign := TTextAlign.Center;
+  LLblPreco.HitTest := False;
+
+  { Badge de estoque baixo }
+  if AProduto.Estoque_Atual <= AProduto.Estoque_Minimo then
+  begin
+    LBadge := TRectangle.Create(Self);
+    LBadge.Parent := Result;
+    LBadge.Position.X := CARD_WIDTH - 52;
+    LBadge.Position.Y := 12;
+    LBadge.Width := 40;
+    LBadge.Height := 22;
+    LBadge.XRadius := 11;
+    LBadge.YRadius := 11;
+    LBadge.Fill.Kind := TBrushKind.Solid;
+    LBadge.Fill.Color := TTheme.CorErro;
+    LBadge.Stroke.Kind := TBrushKind.None;
+    LBadge.HitTest := False;
+
+    LLblBadge := TLabel.Create(Self);
+    LLblBadge.Parent := LBadge;
+    LLblBadge.Align := TAlignLayout.Client;
+    LLblBadge.Text := IntToStr(AProduto.Estoque_Atual);
+    LLblBadge.StyledSettings := [];
+    LLblBadge.TextSettings.Font.Size := TTheme.FontSmall;
+    LLblBadge.TextSettings.Font.Style := [TFontStyle.fsBold];
+    LLblBadge.TextSettings.FontColor := TTheme.CorTextoBranco;
+    LLblBadge.TextSettings.HorzAlign := TTextAlign.Center;
+    LLblBadge.TextSettings.VertAlign := TTextAlign.Center;
+    LLblBadge.HitTest := False;
+  end;
+end;
+
+procedure TFrmPDV.CardMouseEnter(Sender: TObject);
+begin
+  if Sender is TRectangle then
+  begin
+    TRectangle(Sender).Stroke.Color := TTheme.CorPrincipal;
+    TControl(Sender).SetEscala(1.03);
+  end;
+end;
+
+procedure TFrmPDV.CardMouseLeave(Sender: TObject);
+begin
+  if Sender is TRectangle then
+  begin
+    TRectangle(Sender).Stroke.Color := TTheme.CorBorda;
+    TControl(Sender).SetEscala(1.0);
+  end;
+end;
+
+procedure TFrmPDV.ProdutoCardClick(Sender: TObject);
+var
+  LProduto: TProduto;
+begin
+  if not (Sender is TRectangle) then
+    Exit;
+  LProduto := GetProdutoPorId(TRectangle(Sender).Tag);
+  if not Assigned(LProduto) then
+    Exit;
+  try
+    FControllerVenda.AdicionarProduto(LProduto, 1);
+    AtualizarCarrinho;
+  except
+    on E: Exception do
+      TDialogService.ShowMessage(E.Message);
+  end;
+end;
+
+{ ============================================================
+  CARRINHO
+  ============================================================ }
+
+procedure TFrmPDV.AtualizarCarrinho;
+begin
+  RenderizarItensCarrinho;
+  AtualizarTotais;
+end;
+
+procedure TFrmPDV.RenderizarItensCarrinho;
+var
+  I: Integer;
+  LItem: TVendaItem;
+  LProduto: TProduto;
+  LCard: TRectangle;
+  LLayBtns: TLayout;
+  LLayInfo: TLayout;
+  LLblNome: TLabel;
+  LRowInfo: TLayout;
+  LLblQtd: TLabel;
+  LLblSubtotal: TLabel;
+  LBtnMais, LBtnMenos, LBtnRemover: TRectangle;
+  LLblMais, LLblMenos, LLblRemover: TLabel;
+begin
+  ScrollItens.Content.DeleteChildren;
+
+  for I := 0 to FControllerVenda.Carrinho.Count - 1 do
+  begin
+    LItem := FControllerVenda.Carrinho[I];
+    LProduto := GetProdutoPorId(LItem.Produto_Id);
+
+    LCard := TRectangle.Create(Self);
+    LCard.Parent := ScrollItens;
+    LCard.Align := TAlignLayout.Top;
+    LCard.Height := 76;
+    LCard.Margins.Left := 16;
+    LCard.Margins.Right := 16;
+    LCard.Margins.Top := 8;
+    LCard.XRadius := 12;
+    LCard.YRadius := 12;
+    LCard.Fill.Kind := TBrushKind.Solid;
+    LCard.Fill.Color := TTheme.CorFundo;
+    LCard.Stroke.Kind := TBrushKind.None;
+    LCard.HitTest := False;
+    LCard.Tag := I;
+
+    { Botoes a direita (-, +, x) }
+    LLayBtns := TLayout.Create(Self);
+    LLayBtns.Parent := LCard;
+    LLayBtns.Align := TAlignLayout.Right;
+    LLayBtns.Width := 116;
+
+    LBtnRemover := TRectangle.Create(Self);
+    LBtnRemover.Parent := LLayBtns;
+    LBtnRemover.Align := TAlignLayout.Right;
+    LBtnRemover.Width := 32;
+    LBtnRemover.Margins.Right := 10;
+    LBtnRemover.Margins.Top := 22;
+    LBtnRemover.Margins.Bottom := 22;
+    LBtnRemover.XRadius := 8;
+    LBtnRemover.YRadius := 8;
+    LBtnRemover.Fill.Kind := TBrushKind.Solid;
+    LBtnRemover.Fill.Color := TTheme.CorFundoSecundario;
+    LBtnRemover.Stroke.Kind := TBrushKind.None;
+    LBtnRemover.Cursor := crHandPoint;
+    LBtnRemover.Tag := I;
+    LBtnRemover.OnClick := BtnRemoverClick;
+    LLblRemover := TLabel.Create(Self);
+    LLblRemover.Parent := LBtnRemover;
+    LLblRemover.Align := TAlignLayout.Client;
+    LLblRemover.Text := Char($00D7);
+    LLblRemover.StyledSettings := [];
+    LLblRemover.TextSettings.Font.Size := 16;
+    LLblRemover.TextSettings.FontColor := TTheme.CorErro;
+    LLblRemover.TextSettings.HorzAlign := TTextAlign.Center;
+    LLblRemover.TextSettings.VertAlign := TTextAlign.Center;
+    LLblRemover.HitTest := False;
+
+    LBtnMais := TRectangle.Create(Self);
+    LBtnMais.Parent := LLayBtns;
+    LBtnMais.Align := TAlignLayout.Right;
+    LBtnMais.Width := 32;
+    LBtnMais.Margins.Right := 4;
+    LBtnMais.Margins.Top := 22;
+    LBtnMais.Margins.Bottom := 22;
+    LBtnMais.XRadius := 8;
+    LBtnMais.YRadius := 8;
+    LBtnMais.Fill.Kind := TBrushKind.Solid;
+    LBtnMais.Fill.Color := TTheme.CorPrincipalLight;
+    LBtnMais.Stroke.Kind := TBrushKind.None;
+    LBtnMais.Cursor := crHandPoint;
+    LBtnMais.Tag := I;
+    LBtnMais.OnClick := BtnMaisClick;
+    LLblMais := TLabel.Create(Self);
+    LLblMais.Parent := LBtnMais;
+    LLblMais.Align := TAlignLayout.Client;
+    LLblMais.Text := '+';
+    LLblMais.StyledSettings := [];
+    LLblMais.TextSettings.Font.Size := 16;
+    LLblMais.TextSettings.Font.Style := [TFontStyle.fsBold];
+    LLblMais.TextSettings.FontColor := TTheme.CorPrincipal;
+    LLblMais.TextSettings.HorzAlign := TTextAlign.Center;
+    LLblMais.TextSettings.VertAlign := TTextAlign.Center;
+    LLblMais.HitTest := False;
+
+    LBtnMenos := TRectangle.Create(Self);
+    LBtnMenos.Parent := LLayBtns;
+    LBtnMenos.Align := TAlignLayout.Right;
+    LBtnMenos.Width := 32;
+    LBtnMenos.Margins.Right := 4;
+    LBtnMenos.Margins.Top := 22;
+    LBtnMenos.Margins.Bottom := 22;
+    LBtnMenos.XRadius := 8;
+    LBtnMenos.YRadius := 8;
+    LBtnMenos.Fill.Kind := TBrushKind.Solid;
+    LBtnMenos.Fill.Color := TTheme.CorFundoSecundario;
+    LBtnMenos.Stroke.Kind := TBrushKind.None;
+    LBtnMenos.Cursor := crHandPoint;
+    LBtnMenos.Tag := I;
+    LBtnMenos.OnClick := BtnMenosClick;
+    LLblMenos := TLabel.Create(Self);
+    LLblMenos.Parent := LBtnMenos;
+    LLblMenos.Align := TAlignLayout.Client;
+    LLblMenos.Text := Char($2212);
+    LLblMenos.StyledSettings := [];
+    LLblMenos.TextSettings.Font.Size := 16;
+    LLblMenos.TextSettings.Font.Style := [TFontStyle.fsBold];
+    LLblMenos.TextSettings.FontColor := TTheme.CorTextoSecundario;
+    LLblMenos.TextSettings.HorzAlign := TTextAlign.Center;
+    LLblMenos.TextSettings.VertAlign := TTextAlign.Center;
+    LLblMenos.HitTest := False;
+
+    { Area de info (nome + linha qtd/subtotal) }
+    LLayInfo := TLayout.Create(Self);
+    LLayInfo.Parent := LCard;
+    LLayInfo.Align := TAlignLayout.Client;
+    LLayInfo.Padding.Left := 14;
+    LLayInfo.Padding.Top := 12;
+    LLayInfo.Padding.Bottom := 12;
+
+    LLblNome := TLabel.Create(Self);
+    LLblNome.Parent := LLayInfo;
+    LLblNome.Align := TAlignLayout.Top;
+    LLblNome.Height := 22;
+    if Assigned(LProduto) then
+      LLblNome.Text := LProduto.Nome
+    else
+      LLblNome.Text := 'Produto #' + IntToStr(LItem.Produto_Id);
+    LLblNome.StyledSettings := [];
+    LLblNome.TextSettings.Font.Size := TTheme.FontNormal;
+    LLblNome.TextSettings.Font.Style := [TFontStyle.fsBold];
+    LLblNome.TextSettings.FontColor := TTheme.CorTexto;
+    LLblNome.HitTest := False;
+
+    LRowInfo := TLayout.Create(Self);
+    LRowInfo.Parent := LLayInfo;
+    LRowInfo.Align := TAlignLayout.Top;
+    LRowInfo.Height := 20;
+
+    LLblQtd := TLabel.Create(Self);
+    LLblQtd.Parent := LRowInfo;
+    LLblQtd.Align := TAlignLayout.Left;
+    LLblQtd.Width := 130;
+    LLblQtd.Text := Format('%d  x  %s', [LItem.Quantidade, FormatarMoeda(LItem.Preco_Unitario)]);
+    LLblQtd.StyledSettings := [];
+    LLblQtd.TextSettings.Font.Size := TTheme.FontSmall;
+    LLblQtd.TextSettings.FontColor := TTheme.CorTextoSecundario;
+    LLblQtd.TextSettings.VertAlign := TTextAlign.Center;
+    LLblQtd.HitTest := False;
+
+    LLblSubtotal := TLabel.Create(Self);
+    LLblSubtotal.Parent := LRowInfo;
+    LLblSubtotal.Align := TAlignLayout.Client;
+    LLblSubtotal.Text := FormatarMoeda(LItem.Subtotal);
+    LLblSubtotal.StyledSettings := [];
+    LLblSubtotal.TextSettings.Font.Size := TTheme.FontNormal;
+    LLblSubtotal.TextSettings.Font.Style := [TFontStyle.fsBold];
+    LLblSubtotal.TextSettings.FontColor := TTheme.CorPrincipal;
+    LLblSubtotal.TextSettings.HorzAlign := TTextAlign.Trailing;
+    LLblSubtotal.TextSettings.VertAlign := TTextAlign.Center;
+    LLblSubtotal.HitTest := False;
+  end;
+end;
+
+procedure TFrmPDV.AtualizarTotais;
+begin
+  lblSubtotalVal.Text := FormatarMoeda(FControllerVenda.CalcularSubtotal);
+  lblDescontoVal.Text := '- ' + FormatarMoeda(FControllerVenda.Desconto);
+  lblTotalVal.Text := FormatarMoeda(FControllerVenda.CalcularTotal);
+end;
+
+procedure TFrmPDV.BtnMaisClick(Sender: TObject);
+var
+  LIndex: Integer;
+  LItem: TVendaItem;
+begin
+  if not (Sender is TRectangle) then Exit;
+  LIndex := TRectangle(Sender).Tag;
+  if (LIndex < 0) or (LIndex >= FControllerVenda.Carrinho.Count) then Exit;
+  LItem := FControllerVenda.Carrinho[LIndex];
+  try
+    FControllerVenda.AlterarQuantidade(LIndex, LItem.Quantidade + 1);
+    AtualizarCarrinho;
+  except
+    on E: Exception do
+      TDialogService.ShowMessage(E.Message);
+  end;
+end;
+
+procedure TFrmPDV.BtnMenosClick(Sender: TObject);
+var
+  LIndex: Integer;
+  LItem: TVendaItem;
+begin
+  if not (Sender is TRectangle) then Exit;
+  LIndex := TRectangle(Sender).Tag;
+  if (LIndex < 0) or (LIndex >= FControllerVenda.Carrinho.Count) then Exit;
+  LItem := FControllerVenda.Carrinho[LIndex];
+  if LItem.Quantidade <= 1 then
+    FControllerVenda.RemoverItem(LIndex)
+  else
+  begin
+    try
+      FControllerVenda.AlterarQuantidade(LIndex, LItem.Quantidade - 1);
+    except
+      on E: Exception do
+        TDialogService.ShowMessage(E.Message);
+    end;
+  end;
+  AtualizarCarrinho;
+end;
+
+procedure TFrmPDV.BtnRemoverClick(Sender: TObject);
+var
+  LIndex: Integer;
+begin
+  if not (Sender is TRectangle) then Exit;
+  LIndex := TRectangle(Sender).Tag;
+  if (LIndex < 0) or (LIndex >= FControllerVenda.Carrinho.Count) then Exit;
+  FControllerVenda.RemoverItem(LIndex);
+  AtualizarCarrinho;
+end;
+
+procedure TFrmPDV.EdtDescontoChange(Sender: TObject);
+var
+  LValor: Currency;
+  LTexto: string;
+begin
+  { Pode disparar durante o carregamento do .fmx, antes do FormCreate }
+  if not Assigned(FControllerVenda) then
+    Exit;
+
+  LTexto := Trim(StringReplace(EdtDesconto.Text, ',', '.', [rfReplaceAll]));
+  if LTexto = '' then
+    LValor := 0
+  else
+    LValor := StrToCurrDef(LTexto, 0);
+  try
+    FControllerVenda.AplicarDesconto(LValor);
+  except
+    FControllerVenda.AplicarDesconto(0);
+  end;
+  AtualizarTotais;
+end;
+
+{ ============================================================
+  MENU LATERAL
+  ============================================================ }
+
+procedure TFrmPDV.MenuItemClick(Sender: TObject);
+begin
+  if not (Sender is TRectangle) then
+    Exit;
+  DestacarMenu(TRectangle(Sender).Tag);
+  if TRectangle(Sender).Tag <> 0 then
+    TDialogService.ShowMessage('Modulo em construcao.');
+end;
+
+procedure TFrmPDV.DestacarMenu(ATag: Integer);
+var
+  I, J: Integer;
+  LItem: TRectangle;
+  LObj: TFmxObject;
+begin
+  for I := 0 to High(FMenuItens) do
+  begin
+    LItem := FMenuItens[I];
+    if LItem.Tag = ATag then
+    begin
+      LItem.Fill.Kind := TBrushKind.Solid;
+      LItem.Fill.Color := TTheme.CorPrincipalLight;
+    end
+    else
+      LItem.Fill.Kind := TBrushKind.None;
+
+    for J := 0 to LItem.ChildrenCount - 1 do
+    begin
+      LObj := LItem.Children[J];
+      if (LObj is TLabel) and (TLabel(LObj).Align = TAlignLayout.Client) then
+      begin
+        if LItem.Tag = ATag then
+        begin
+          TLabel(LObj).TextSettings.Font.Style := [TFontStyle.fsBold];
+          TLabel(LObj).TextSettings.FontColor := TTheme.CorPrincipal;
+        end
+        else
+        begin
+          TLabel(LObj).TextSettings.Font.Style := [];
+          TLabel(LObj).TextSettings.FontColor := TTheme.CorTextoSecundario;
+        end;
+      end
+      else if (LObj is TLabel) and (TLabel(LObj).Align = TAlignLayout.Left) then
+      begin
+        if LItem.Tag = ATag then
+          TLabel(LObj).TextSettings.FontColor := TTheme.CorPrincipal
+        else
+          TLabel(LObj).TextSettings.FontColor := TTheme.CorTextoSecundario;
+      end;
+    end;
+  end;
+end;
+
+procedure TFrmPDV.BtnLogoutClick(Sender: TObject);
+begin
+  Close;
+end;
+
+{ ============================================================
+  ACOES (finalizar, cancelar, salvar, busca, atalhos)
+  ============================================================ }
+
+procedure TFrmPDV.BtnFinalizarClick(Sender: TObject);
+begin
+  if FControllerVenda.Carrinho.Count = 0 then
+  begin
+    TDialogService.ShowMessage('Carrinho vazio. Adicione produtos antes de finalizar.');
+    Exit;
+  end;
+  ExibirDialogPagamento;
+end;
+
+procedure TFrmPDV.BtnCancelarClick(Sender: TObject);
+begin
+  if FControllerVenda.Carrinho.Count = 0 then
+    Exit;
+  TDialogService.MessageDialog(
+    'Cancelar a venda atual? Todos os itens serao removidos.',
+    TMsgDlgType.mtConfirmation,
+    [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], TMsgDlgBtn.mbNo, 0,
+    procedure(const AResult: TModalResult)
+    begin
+      if AResult = mrYes then
+      begin
+        FControllerVenda.CancelarVenda;
+        EdtDesconto.Text := '0,00';
+        AtualizarCarrinho;
+      end;
+    end);
+end;
+
+procedure TFrmPDV.BtnSalvarClick(Sender: TObject);
+begin
+  TDialogService.ShowMessage('Venda salva em rascunho.');
+end;
+
+procedure TFrmPDV.EdtBuscaChange(Sender: TObject);
+begin
+  { Pode disparar durante o carregamento do .fmx, antes do FormCreate }
+  if not Assigned(FProdutos) then
+    Exit;
+  RenderizarProdutos;
+end;
+
+procedure TFrmPDV.FormKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: Char; Shift: TShiftState);
+begin
+  case Key of
+    vkF2:
+      begin
+        EdtBusca.SetFocus;
+        Key := 0;
+      end;
+    vkF3:
+      begin
+        BtnSalvarClick(nil);
+        Key := 0;
+      end;
+    vkF5:
+      begin
+        BtnFinalizarClick(nil);
+        Key := 0;
+      end;
+    vkEscape:
+      begin
+        BtnCancelarClick(nil);
+        Key := 0;
+      end;
+  end;
+end;
+
+procedure TFrmPDV.ExibirDialogPagamento;
+var
+  LForm: TForm;
+  LLayout: TLayout;
+  LLblTitulo, LLblTotal, LLblMetodo, LLblParcelas, LLblCPF: TLabel;
+  LCmbMetodo, LCmbParcelas: TComboBox;
+  LEdtCPF: TEdit;
+  LBtnConfirmar, LBtnVoltar: TButton;
+  I: Integer;
+begin
+  LForm := TForm.CreateNew(Self);
+  try
+    LForm.Caption := 'Finalizar Pagamento';
+    LForm.ClientWidth := 420;
+    LForm.ClientHeight := 440;
+    LForm.Position := TFormPosition.ScreenCenter;
+    LForm.BorderStyle := TFmxFormBorderStyle.Single;
+    LForm.Fill.Kind := TBrushKind.Solid;
+    LForm.Fill.Color := TTheme.CorFundoCard;
+
+    LLayout := TLayout.Create(LForm);
+    LLayout.Parent := LForm;
+    LLayout.Align := TAlignLayout.Client;
+    LLayout.Padding.Left := 24;
+    LLayout.Padding.Right := 24;
+    LLayout.Padding.Top := 20;
+    LLayout.Padding.Bottom := 20;
+
+    LLblTitulo := TLabel.Create(LForm);
+    LLblTitulo.Parent := LLayout;
+    LLblTitulo.Align := TAlignLayout.Top;
+    LLblTitulo.Height := 36;
+    LLblTitulo.Text := 'Finalizar Pagamento';
+    LLblTitulo.StyledSettings := [];
+    LLblTitulo.TextSettings.Font.Size := 20;
+    LLblTitulo.TextSettings.Font.Style := [TFontStyle.fsBold];
+    LLblTitulo.TextSettings.FontColor := TTheme.CorTexto;
+    LLblTitulo.TextSettings.HorzAlign := TTextAlign.Center;
+
+    LLblTotal := TLabel.Create(LForm);
+    LLblTotal.Parent := LLayout;
+    LLblTotal.Align := TAlignLayout.Top;
+    LLblTotal.Height := 40;
+    LLblTotal.Text := 'Total: ' + FormatarMoeda(FControllerVenda.CalcularTotal);
+    LLblTotal.StyledSettings := [];
+    LLblTotal.TextSettings.Font.Size := TTheme.FontHeading;
+    LLblTotal.TextSettings.Font.Style := [TFontStyle.fsBold];
+    LLblTotal.TextSettings.FontColor := TTheme.CorPrincipal;
+    LLblTotal.TextSettings.HorzAlign := TTextAlign.Center;
+    LLblTotal.Margins.Bottom := 16;
+
+    LLblMetodo := TLabel.Create(LForm);
+    LLblMetodo.Parent := LLayout;
+    LLblMetodo.Align := TAlignLayout.Top;
+    LLblMetodo.Height := 22;
+    LLblMetodo.Text := 'Forma de Pagamento:';
+    LLblMetodo.StyledSettings := [];
+    LLblMetodo.TextSettings.Font.Size := TTheme.FontNormal;
+    LLblMetodo.TextSettings.FontColor := TTheme.CorTextoSecundario;
+    LLblMetodo.Margins.Top := 8;
+
+    LCmbMetodo := TComboBox.Create(LForm);
+    LCmbMetodo.Parent := LLayout;
+    LCmbMetodo.Align := TAlignLayout.Top;
+    LCmbMetodo.Height := 44;
+    LCmbMetodo.Items.Add('DINHEIRO');
+    LCmbMetodo.Items.Add('DEBITO');
+    LCmbMetodo.Items.Add('CREDITO');
+    LCmbMetodo.Items.Add('PIX');
+    LCmbMetodo.Items.Add('COMANDA');
+    LCmbMetodo.ItemIndex := 0;
+    LCmbMetodo.Margins.Bottom := 8;
+
+    LLblParcelas := TLabel.Create(LForm);
+    LLblParcelas.Parent := LLayout;
+    LLblParcelas.Align := TAlignLayout.Top;
+    LLblParcelas.Height := 22;
+    LLblParcelas.Text := 'Parcelas (somente credito):';
+    LLblParcelas.StyledSettings := [];
+    LLblParcelas.TextSettings.Font.Size := TTheme.FontNormal;
+    LLblParcelas.TextSettings.FontColor := TTheme.CorTextoSecundario;
+
+    LCmbParcelas := TComboBox.Create(LForm);
+    LCmbParcelas.Parent := LLayout;
+    LCmbParcelas.Align := TAlignLayout.Top;
+    LCmbParcelas.Height := 44;
+    for I := 1 to 12 do
+      LCmbParcelas.Items.Add(IntToStr(I) + 'x');
+    LCmbParcelas.ItemIndex := 0;
+    LCmbParcelas.Margins.Bottom := 8;
+
+    LLblCPF := TLabel.Create(LForm);
+    LLblCPF.Parent := LLayout;
+    LLblCPF.Align := TAlignLayout.Top;
+    LLblCPF.Height := 22;
+    LLblCPF.Text := 'CPF na nota (opcional):';
+    LLblCPF.StyledSettings := [];
+    LLblCPF.TextSettings.Font.Size := TTheme.FontNormal;
+    LLblCPF.TextSettings.FontColor := TTheme.CorTextoSecundario;
+
+    LEdtCPF := TEdit.Create(LForm);
+    LEdtCPF.Parent := LLayout;
+    LEdtCPF.Align := TAlignLayout.Top;
+    LEdtCPF.Height := 44;
+    LEdtCPF.TextPrompt := '000.000.000-00';
+    LEdtCPF.FilterChar := '0123456789.-';
+    LEdtCPF.Margins.Bottom := 16;
+
+    LBtnConfirmar := TButton.Create(LForm);
+    LBtnConfirmar.Parent := LLayout;
+    LBtnConfirmar.Align := TAlignLayout.Bottom;
+    LBtnConfirmar.Height := 50;
+    LBtnConfirmar.Text := 'Confirmar Pagamento';
+    LBtnConfirmar.ModalResult := mrOk;
+
+    LBtnVoltar := TButton.Create(LForm);
+    LBtnVoltar.Parent := LLayout;
+    LBtnVoltar.Align := TAlignLayout.Bottom;
+    LBtnVoltar.Height := 40;
+    LBtnVoltar.Text := 'Voltar';
+    LBtnVoltar.ModalResult := mrCancel;
+    LBtnVoltar.Margins.Bottom := 4;
+
+    if LForm.ShowModal = mrOk then
+    begin
+      try
+        FControllerVenda.FinalizarVenda(
+          LCmbMetodo.Items[LCmbMetodo.ItemIndex],
+          LCmbParcelas.ItemIndex + 1,
+          Trim(LEdtCPF.Text),
+          FCaixaId,
+          FColaboradorId);
+        EdtDesconto.Text := '0,00';
+        AtualizarCarrinho;
+        TDialogService.ShowMessage('Venda finalizada com sucesso!');
+      except
+        on E: Exception do
+          TDialogService.ShowMessage('Erro ao finalizar: ' + E.Message);
+      end;
+    end;
+  finally
+    LForm.Free;
+  end;
+end;
+
+{ ============================================================
+  HELPERS
+  ============================================================ }
+
+procedure TFrmPDV.PopularDadosMock;
+
+  function CriarCategoria(AId: Integer; const ANome: string): TCategoria;
+  begin
+    Result := TCategoria.Create;
+    Result.Id := AId;
+    Result.Nome := ANome;
+    Result.Situacao := 1;
+  end;
+
+  function CriarProduto(AId: Integer; const ANome: string;
+    ACategoriaId: Integer; APreco: Currency; AEstoque: Integer): TProduto;
+  begin
+    Result := TProduto.Create;
+    Result.Id := AId;
+    Result.Nome := ANome;
+    Result.Categoria_Id := ACategoriaId;
+    Result.Preco_Venda := APreco;
+    Result.Estoque_Atual := AEstoque;
+    Result.Estoque_Minimo := 5;
+    Result.Codigo_Barras := Format('789%010d', [AId]);
+    Result.Situacao := 1;
+  end;
+
+begin
+  FCategorias.Add(CriarCategoria(1, 'Ingressos'));
+  FCategorias.Add(CriarCategoria(2, 'Alimentacao'));
+  FCategorias.Add(CriarCategoria(3, 'Lembrancas'));
+  FCategorias.Add(CriarCategoria(4, 'Pacotes'));
+  FCategorias.Add(CriarCategoria(5, 'Servicos'));
+
+  FProdutos.Add(CriarProduto(1, 'Ingresso 30 Min', 1, 20.00, 100));
+  FProdutos.Add(CriarProduto(2, 'Ingresso 60 Min', 1, 30.00, 100));
+  FProdutos.Add(CriarProduto(3, 'Passaporte Dia Todo', 1, 50.00, 100));
+  FProdutos.Add(CriarProduto(4, 'Pipoca', 2, 8.00, 40));
+  FProdutos.Add(CriarProduto(5, 'Refrigerante', 2, 6.00, 60));
+  FProdutos.Add(CriarProduto(6, 'Algodao Doce', 2, 10.00, 3));
+  FProdutos.Add(CriarProduto(7, 'Pelucia', 3, 25.00, 15));
+  FProdutos.Add(CriarProduto(8, 'Boneco Heroi', 3, 35.00, 8));
+  FProdutos.Add(CriarProduto(9, 'Pacote Festa Basico', 4, 350.00, 99));
+  FProdutos.Add(CriarProduto(10, 'Pacote Festa Premium', 4, 650.00, 99));
+  FProdutos.Add(CriarProduto(11, 'Pintura Facial', 5, 15.00, 99));
+  FProdutos.Add(CriarProduto(12, 'Recreador Extra', 5, 80.00, 99));
+end;
+
+function TFrmPDV.FormatarMoeda(AValor: Currency): string;
+begin
+  Result := Format('R$ %s', [FormatCurr('#,##0.00', AValor)]);
+end;
+
+function TFrmPDV.GetProdutoPorId(AId: Integer): TProduto;
+var
+  I: Integer;
+begin
+  Result := nil;
+  for I := 0 to FProdutos.Count - 1 do
+    if FProdutos[I].Id = AId then
+      Exit(FProdutos[I]);
+end;
+
+end.

@@ -1,0 +1,516 @@
+object FrmCaixa: TFrmCaixa
+  Left = 0
+  Top = 0
+  Caption = 'SANCTO PDV - Caixa'
+  ClientHeight = 800
+  ClientWidth = 600
+  Position = ScreenCenter
+  BorderStyle = Sizeable
+  Fill.Kind = Solid
+  Fill.Color = $FFF5F5F5
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object LayoutPrincipal: TLayout
+    Align = Client
+    Padding.Left = 16.000000000000000000
+    Padding.Top = 12.000000000000000000
+    Padding.Right = 16.000000000000000000
+    Padding.Bottom = 12.000000000000000000
+    Size.Width = 600.000000000000000000
+    Size.Height = 800.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object ScrollBox: TVertScrollBox
+      Align = Client
+      Size.Width = 568.000000000000000000
+      Size.Height = 776.000000000000000000
+      Size.PlatformDefault = False
+      ShowScrollBars = True
+      TabOrder = 0
+      object RectStatus: TRectangle
+        Align = Top
+        Margins.Bottom = 12.000000000000000000
+        Size.Width = 568.000000000000000000
+        Size.Height = 120.000000000000000000
+        Size.PlatformDefault = False
+        Fill.Kind = Solid
+        Fill.Color = $FFFFFFFF
+        Stroke.Kind = Solid
+        Stroke.Color = $FFE0E0E0
+        XRadius = 8.000000000000000000
+        YRadius = 8.000000000000000000
+        object LblStatusTitulo: TLabel
+          Position.X = 16.000000000000000000
+          Position.Y = 12.000000000000000000
+          Size.Width = 300.000000000000000000
+          Size.Height = 28.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 18.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = $FF9E9E9E
+          Text = 'CAIXA FECHADO'
+          TabOrder = 0
+        end
+        object LblStatusColaborador: TLabel
+          Position.X = 16.000000000000000000
+          Position.Y = 42.000000000000000000
+          Size.Width = 400.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 14.000000000000000000
+          TextSettings.FontColor = $FF757575
+          Text = 'Operador: --'
+          TabOrder = 1
+        end
+        object LblStatusHoraAbertura: TLabel
+          Position.X = 16.000000000000000000
+          Position.Y = 66.000000000000000000
+          Size.Width = 400.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 14.000000000000000000
+          TextSettings.FontColor = $FF757575
+          Text = 'Abertura: --'
+          TabOrder = 2
+        end
+        object LblStatusSaldo: TLabel
+          Position.X = 16.000000000000000000
+          Position.Y = 90.000000000000000000
+          Size.Width = 400.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 16.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = $FF212121
+          Text = 'Saldo: R$ 0,00'
+          TabOrder = 3
+        end
+      end
+      object LayoutAbertura: TLayout
+        Align = Top
+        Margins.Bottom = 12.000000000000000000
+        Size.Width = 568.000000000000000000
+        Size.Height = 220.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        object RectAbertura: TRectangle
+          Align = Client
+          Size.Width = 568.000000000000000000
+          Size.Height = 220.000000000000000000
+          Size.PlatformDefault = False
+          Fill.Kind = Solid
+          Fill.Color = $FFFFFFFF
+          Stroke.Kind = Solid
+          Stroke.Color = $FFE0E0E0
+          XRadius = 8.000000000000000000
+          YRadius = 8.000000000000000000
+          object LblAberturaTitulo: TLabel
+            Position.X = 16.000000000000000000
+            Position.Y = 12.000000000000000000
+            Size.Width = 300.000000000000000000
+            Size.Height = 28.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.Font.Style = [fsBold]
+            TextSettings.FontColor = $FF212121
+            Text = 'Abrir Caixa'
+            TabOrder = 0
+          end
+          object LblAberturaValor: TLabel
+            Position.X = 16.000000000000000000
+            Position.Y = 48.000000000000000000
+            Size.Width = 300.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.FontColor = $FF757575
+            Text = 'Valor Inicial (R$)'
+            TabOrder = 1
+          end
+          object EdtAberturaValor: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Position.X = 16.000000000000000000
+            Position.Y = 72.000000000000000000
+            Size.Width = 300.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 16.000000000000000000
+            TextPrompt = '0,00'
+            KeyboardType = DecimalNumberPad
+            TabOrder = 0
+          end
+          object BtnAbrirCaixa: TButton
+            Position.X = 16.000000000000000000
+            Position.Y = 135.000000000000000000
+            Size.Width = 300.000000000000000000
+            Size.Height = 52.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.Font.Style = [fsBold]
+            Text = 'Abrir Caixa'
+            TabOrder = 1
+          end
+          object LblAberturaErro: TLabel
+            Position.X = 16.000000000000000000
+            Position.Y = 192.000000000000000000
+            Size.Width = 400.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 13.000000000000000000
+            TextSettings.FontColor = $FFD32F2F
+            Text = ''
+            Visible = False
+            TabOrder = 2
+          end
+        end
+      end
+      object LayoutMovimentacoes: TLayout
+        Align = Top
+        Margins.Bottom = 12.000000000000000000
+        Size.Width = 568.000000000000000000
+        Size.Height = 480.000000000000000000
+        Size.PlatformDefault = False
+        Visible = False
+        TabOrder = 2
+        object RectMovimentacoes: TRectangle
+          Align = Client
+          Size.Width = 568.000000000000000000
+          Size.Height = 480.000000000000000000
+          Size.PlatformDefault = False
+          Fill.Kind = Solid
+          Fill.Color = $FFFFFFFF
+          Stroke.Kind = Solid
+          Stroke.Color = $FFE0E0E0
+          XRadius = 8.000000000000000000
+          YRadius = 8.000000000000000000
+          object LblMovTitulo: TLabel
+            Position.X = 16.000000000000000000
+            Position.Y = 12.000000000000000000
+            Size.Width = 300.000000000000000000
+            Size.Height = 28.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.Font.Style = [fsBold]
+            TextSettings.FontColor = $FF212121
+            Text = 'Registrar Movimenta'#231#227'o'
+            TabOrder = 0
+          end
+          object LblMovTipo: TLabel
+            Position.X = 16.000000000000000000
+            Position.Y = 44.000000000000000000
+            Size.Width = 300.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.FontColor = $FF757575
+            Text = 'Tipo'
+            TabOrder = 1
+          end
+          object LayoutTipoBtns: TLayout
+            Position.X = 16.000000000000000000
+            Position.Y = 68.000000000000000000
+            Size.Width = 400.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            TabOrder = 2
+            object BtnTipoSangria: TButton
+              Position.X = 0.000000000000000000
+              Position.Y = 0.000000000000000000
+              Size.Width = 150.000000000000000000
+              Size.Height = 48.000000000000000000
+              Size.PlatformDefault = False
+              StyledSettings = []
+              TextSettings.Font.Size = 14.000000000000000000
+              TextSettings.Font.Style = [fsBold]
+              Text = 'Sangria'
+              TabOrder = 0
+            end
+            object BtnTipoSuprimento: TButton
+              Position.X = 160.000000000000000000
+              Position.Y = 0.000000000000000000
+              Size.Width = 150.000000000000000000
+              Size.Height = 48.000000000000000000
+              Size.PlatformDefault = False
+              StyledSettings = []
+              TextSettings.Font.Size = 14.000000000000000000
+              TextSettings.Font.Style = [fsBold]
+              Text = 'Suprimento'
+              TabOrder = 1
+            end
+          end
+          object LblMovValor: TLabel
+            Position.X = 16.000000000000000000
+            Position.Y = 124.000000000000000000
+            Size.Width = 300.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.FontColor = $FF757575
+            Text = 'Valor (R$)'
+            TabOrder = 3
+          end
+          object EdtMovValor: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Position.X = 16.000000000000000000
+            Position.Y = 148.000000000000000000
+            Size.Width = 300.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 16.000000000000000000
+            TextPrompt = '0,00'
+            KeyboardType = DecimalNumberPad
+            TabOrder = 1
+          end
+          object LblMovMotivo: TLabel
+            Position.X = 16.000000000000000000
+            Position.Y = 204.000000000000000000
+            Size.Width = 300.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.FontColor = $FF757575
+            Text = 'Motivo'
+            TabOrder = 4
+          end
+          object EdtMovMotivo: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Position.X = 16.000000000000000000
+            Position.Y = 228.000000000000000000
+            Size.Width = 400.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 16.000000000000000000
+            TextPrompt = 'Descreva o motivo (m'#237'n. 3 caracteres)'
+            MaxLength = 200
+            TabOrder = 2
+          end
+          object BtnRegistrar: TButton
+            Position.X = 16.000000000000000000
+            Position.Y = 290.000000000000000000
+            Size.Width = 300.000000000000000000
+            Size.Height = 52.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.Font.Style = [fsBold]
+            Text = 'Registrar'
+            TabOrder = 3
+          end
+          object LblMovErro: TLabel
+            Position.X = 16.000000000000000000
+            Position.Y = 346.000000000000000000
+            Size.Width = 450.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 13.000000000000000000
+            TextSettings.FontColor = $FFD32F2F
+            Text = ''
+            Visible = False
+            TabOrder = 5
+          end
+          object LblMovListaTitulo: TLabel
+            Position.X = 16.000000000000000000
+            Position.Y = 374.000000000000000000
+            Size.Width = 300.000000000000000000
+            Size.Height = 24.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.Font.Style = [fsBold]
+            TextSettings.FontColor = $FF212121
+            Text = 'Movimenta'#231#245'es Registradas'
+            TabOrder = 6
+          end
+          object ListBoxMovimentacoes: TListBox
+            Position.X = 16.000000000000000000
+            Position.Y = 400.000000000000000000
+            Size.Width = 530.000000000000000000
+            Size.Height = 70.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            ItemHeight = 32.000000000000000000
+            TabOrder = 7
+          end
+        end
+      end
+      object LayoutFechamento: TLayout
+        Align = Top
+        Margins.Bottom = 12.000000000000000000
+        Size.Width = 568.000000000000000000
+        Size.Height = 320.000000000000000000
+        Size.PlatformDefault = False
+        Visible = False
+        TabOrder = 3
+        object RectFechamento: TRectangle
+          Align = Client
+          Size.Width = 568.000000000000000000
+          Size.Height = 320.000000000000000000
+          Size.PlatformDefault = False
+          Fill.Kind = Solid
+          Fill.Color = $FFFFFFFF
+          Stroke.Kind = Solid
+          Stroke.Color = $FFE0E0E0
+          XRadius = 8.000000000000000000
+          YRadius = 8.000000000000000000
+          object LblFechTitulo: TLabel
+            Position.X = 16.000000000000000000
+            Position.Y = 12.000000000000000000
+            Size.Width = 300.000000000000000000
+            Size.Height = 28.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.Font.Style = [fsBold]
+            TextSettings.FontColor = $FF212121
+            Text = 'Fechar Caixa'
+            TabOrder = 0
+          end
+          object LblFechSaldoEsperado: TLabel
+            Position.X = 16.000000000000000000
+            Position.Y = 46.000000000000000000
+            Size.Width = 200.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.FontColor = $FF757575
+            Text = 'Saldo Esperado:'
+            TabOrder = 1
+          end
+          object LblFechSaldoValor: TLabel
+            Position.X = 220.000000000000000000
+            Position.Y = 46.000000000000000000
+            Size.Width = 200.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.Font.Style = [fsBold]
+            TextSettings.FontColor = $FF212121
+            Text = 'R$ 0,00'
+            TabOrder = 2
+          end
+          object LblFechContagem: TLabel
+            Position.X = 16.000000000000000000
+            Position.Y = 76.000000000000000000
+            Size.Width = 300.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.FontColor = $FF757575
+            Text = 'Contagem F'#237'sica (R$)'
+            TabOrder = 3
+          end
+          object EdtFechContagem: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Position.X = 16.000000000000000000
+            Position.Y = 100.000000000000000000
+            Size.Width = 300.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 16.000000000000000000
+            TextPrompt = '0,00'
+            KeyboardType = DecimalNumberPad
+            TabOrder = 3
+          end
+          object LblFechDiferenca: TLabel
+            Position.X = 16.000000000000000000
+            Position.Y = 156.000000000000000000
+            Size.Width = 150.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.FontColor = $FF757575
+            Text = 'Diferen'#231'a:'
+            TabOrder = 4
+          end
+          object LblFechDiferencaValor: TLabel
+            Position.X = 170.000000000000000000
+            Position.Y = 156.000000000000000000
+            Size.Width = 200.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.Font.Style = [fsBold]
+            TextSettings.FontColor = $FF388E3C
+            Text = 'R$ 0,00'
+            TabOrder = 5
+          end
+          object LblFechJustificativa: TLabel
+            Position.X = 16.000000000000000000
+            Position.Y = 184.000000000000000000
+            Size.Width = 400.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 14.000000000000000000
+            TextSettings.FontColor = $FFD32F2F
+            Text = 'Justificativa (obrigat'#243'ria - m'#237'n. 10 caracteres)'
+            Visible = False
+            TabOrder = 6
+          end
+          object EdtFechJustificativa: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Position.X = 16.000000000000000000
+            Position.Y = 208.000000000000000000
+            Size.Width = 450.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 16.000000000000000000
+            TextPrompt = 'Justifique a diferen'#231'a encontrada'
+            Visible = False
+            TabOrder = 4
+          end
+          object BtnFecharCaixa: TButton
+            Position.X = 16.000000000000000000
+            Position.Y = 264.000000000000000000
+            Size.Width = 300.000000000000000000
+            Size.Height = 52.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.Font.Style = [fsBold]
+            Text = 'Fechar Caixa'
+            TabOrder = 5
+          end
+          object LblFechErro: TLabel
+            Position.X = 16.000000000000000000
+            Position.Y = 294.000000000000000000
+            Size.Width = 450.000000000000000000
+            Size.Height = 22.000000000000000000
+            Size.PlatformDefault = False
+            StyledSettings = []
+            TextSettings.Font.Size = 13.000000000000000000
+            TextSettings.FontColor = $FFD32F2F
+            Text = ''
+            Visible = False
+            TabOrder = 7
+          end
+        end
+      end
+    end
+  end
+end

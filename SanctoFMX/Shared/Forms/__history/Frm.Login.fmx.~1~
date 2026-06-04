@@ -1,0 +1,239 @@
+object FrmLogin: TFrmLogin
+  Left = 0
+  Top = 0
+  Caption = 'SANCTO PDV - Login'
+  ClientHeight = 640
+  ClientWidth = 480
+  Position = ScreenCenter
+  BorderStyle = Single
+  Fill.Kind = Solid
+  Fill.Color = xFFFFFFFF
+  FormFactor.Width = 480
+  FormFactor.Height = 640
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  DesignerMasterStyle = 0
+  object RectFundo: TRectangle
+    Align = Client
+    Fill.Kind = Gradient
+    Fill.Gradient.Points = <
+      item
+        Color = xFFEDE9FE
+        Offset = 0.000000000000000000
+      end
+      item
+        Color = xFFFFFFFF
+        Offset = 1.000000000000000000
+      end>
+    Fill.Gradient.Style = Linear
+    Stroke.Kind = None
+    HitTest = False
+    Size.Width = 480.000000000000000000
+    Size.Height = 640.000000000000000000
+    Size.PlatformDefault = False
+  end
+  object LayoutPrincipal: TLayout
+    Align = Center
+    Size.Width = 400.000000000000000000
+    Size.Height = 560.000000000000000000
+    Size.PlatformDefault = False
+    object RectCard: TRectangle
+      Align = Client
+      Fill.Color = xFFFFFFFF
+      Stroke.Kind = None
+      XRadius = 20.000000000000000000
+      YRadius = 20.000000000000000000
+      HitTest = False
+      Size.Width = 400.000000000000000000
+      Size.Height = 560.000000000000000000
+      Size.PlatformDefault = False
+      object ShadowCard: TShadowEffect
+        Distance = 4.000000000000000000
+        Direction = 90.000000000000000000
+        Softness = 0.400000000000000000
+        Opacity = 0.150000000000000000
+        ShadowColor = xFF000000
+      end
+    end
+    object RectLogoIcon: TRectangle
+      Position.X = 168.000000000000000000
+      Position.Y = 36.000000000000000000
+      Fill.Color = xFF6D28D9
+      Stroke.Kind = None
+      XRadius = 16.000000000000000000
+      YRadius = 16.000000000000000000
+      HitTest = False
+      Size.Width = 64.000000000000000000
+      Size.Height = 64.000000000000000000
+      Size.PlatformDefault = False
+      object lblLogoIcon: TLabel
+        Align = Client
+        StyledSettings = []
+        Size.Width = 64.000000000000000000
+        Size.Height = 64.000000000000000000
+        Size.PlatformDefault = False
+        Text = #9733
+        TextSettings.Font.Size = 32.000000000000000000
+        TextSettings.FontColor = xFFFFFFFF
+        TextSettings.HorzAlign = Center
+        TextSettings.VertAlign = Center
+        HitTest = False
+      end
+    end
+    object lblTitulo: TLabel
+      Position.X = 0.000000000000000000
+      Position.Y = 116.000000000000000000
+      StyledSettings = []
+      Size.Width = 400.000000000000000000
+      Size.Height = 44.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'SANCTO PDV'
+      TextSettings.Font.Size = 28.000000000000000000
+      TextSettings.Font.Style = [fsBold]
+      TextSettings.FontColor = xFF1E293B
+      TextSettings.HorzAlign = Center
+      HitTest = False
+    end
+    object lblSubtitulo: TLabel
+      Position.X = 0.000000000000000000
+      Position.Y = 162.000000000000000000
+      StyledSettings = []
+      Size.Width = 400.000000000000000000
+      Size.Height = 24.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Ponto de Venda - Parque Infantil'
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.FontColor = xFF64748B
+      TextSettings.HorzAlign = Center
+      HitTest = False
+    end
+    object lblCPF: TLabel
+      Position.X = 30.000000000000000000
+      Position.Y = 214.000000000000000000
+      StyledSettings = []
+      Size.Width = 340.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'CPF'
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.FontColor = xFF334155
+      HitTest = False
+    end
+    object EdtCPF: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      TabOrder = 0
+      Position.X = 30.000000000000000000
+      Position.Y = 238.000000000000000000
+      Size.Width = 340.000000000000000000
+      Size.Height = 48.000000000000000000
+      Size.PlatformDefault = False
+      StyledSettings = []
+      TextSettings.Font.Size = 16.000000000000000000
+      TextPrompt = '000.000.000-00'
+      MaxLength = 14
+      OnKeyDown = EdtCPFKeyDown
+      OnChangeTracking = EdtCPFChangeTracking
+    end
+    object lblSenha: TLabel
+      Position.X = 30.000000000000000000
+      Position.Y = 300.000000000000000000
+      StyledSettings = []
+      Size.Width = 340.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Senha'
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.FontColor = xFF334155
+      HitTest = False
+    end
+    object LayoutSenha: TLayout
+      Position.X = 30.000000000000000000
+      Position.Y = 324.000000000000000000
+      Size.Width = 340.000000000000000000
+      Size.Height = 48.000000000000000000
+      Size.PlatformDefault = False
+      object EdtSenha: TEdit
+        Touch.InteractiveGestures = [LongTap, DoubleTap]
+        Align = Client
+        Password = True
+        TabOrder = 0
+        Margins.Right = 52.000000000000000000
+        Size.Width = 288.000000000000000000
+        Size.Height = 48.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 16.000000000000000000
+        TextPrompt = 'Digite sua senha'
+        OnKeyDown = EdtSenhaKeyDown
+      end
+      object BtnToggleSenha: TSpeedButton
+        Align = Right
+        StyledSettings = []
+        TextSettings.Font.Size = 13.000000000000000000
+        Text = 'ver'
+        Size.Width = 48.000000000000000000
+        Size.Height = 48.000000000000000000
+        Size.PlatformDefault = False
+        OnClick = BtnToggleSenhaClick
+      end
+    end
+    object BtnLogin: TRectangle
+      Cursor = crHandPoint
+      Position.X = 30.000000000000000000
+      Position.Y = 396.000000000000000000
+      Fill.Color = xFF6D28D9
+      Stroke.Kind = None
+      XRadius = 12.000000000000000000
+      YRadius = 12.000000000000000000
+      Size.Width = 340.000000000000000000
+      Size.Height = 56.000000000000000000
+      Size.PlatformDefault = False
+      OnClick = BtnLoginClick
+      object lblBtnLogin: TLabel
+        Align = Client
+        StyledSettings = []
+        Size.Width = 340.000000000000000000
+        Size.Height = 56.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'ENTRAR'
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.Font.Style = [fsBold]
+        TextSettings.FontColor = xFFFFFFFF
+        TextSettings.HorzAlign = Center
+        TextSettings.VertAlign = Center
+        HitTest = False
+      end
+    end
+    object lblErro: TLabel
+      Position.X = 30.000000000000000000
+      Position.Y = 466.000000000000000000
+      StyledSettings = []
+      Visible = False
+      Size.Width = 340.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      Text = ''
+      TextSettings.Font.Size = 14.000000000000000000
+      TextSettings.FontColor = xFFEF4444
+      TextSettings.HorzAlign = Center
+      TextSettings.WordWrap = True
+      HitTest = False
+    end
+    object lblBloqueio: TLabel
+      Position.X = 30.000000000000000000
+      Position.Y = 508.000000000000000000
+      StyledSettings = []
+      Visible = False
+      Size.Width = 340.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+      Text = ''
+      TextSettings.Font.Size = 13.000000000000000000
+      TextSettings.FontColor = xFFF59E0B
+      TextSettings.HorzAlign = Center
+      TextSettings.WordWrap = True
+      HitTest = False
+    end
+  end
+end

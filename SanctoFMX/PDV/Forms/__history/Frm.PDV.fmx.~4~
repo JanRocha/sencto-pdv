@@ -1,0 +1,920 @@
+object FrmPDV: TFrmPDV
+  Left = 0
+  Top = 0
+  Caption = 'Sancto PDV - Parque Infantil'
+  ClientHeight = 1080
+  ClientWidth = 1920
+  Position = ScreenCenter
+  WindowState = wsMaximized
+  FormFactor.Width = 1920
+  FormFactor.Height = 1080
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  DesignerMasterStyle = 0
+  object RectRoot: TRectangle
+    Align = Client
+    Fill.Color = xFFF8FAFC
+    HitTest = False
+    Size.Width = 1920.000000000000000000
+    Size.Height = 1080.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Kind = None
+    object LayoutSidebar: TLayout
+      Align = Left
+      Size.Width = 240.000000000000000000
+      Size.Height = 1080.000000000000000000
+      Size.PlatformDefault = False
+      object RectSidebarBg: TRectangle
+        Align = Client
+        Fill.Color = claWhite
+        HitTest = False
+        Size.Width = 239.000000000000000000
+        Size.Height = 824.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+      end
+      object RectSidebarBorder: TRectangle
+        Align = Right
+        Fill.Color = xFFE2E8F0
+        HitTest = False
+        Position.X = 239.000000000000000000
+        Position.Y = 116.000000000000000000
+        Size.Width = 1.000000000000000000
+        Size.Height = 824.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+      end
+      object LayoutLogo: TLayout
+        Align = Top
+        Size.Width = 240.000000000000000000
+        Size.Height = 84.000000000000000000
+        Size.PlatformDefault = False
+        object RectLogoIcon: TRectangle
+          Fill.Color = xFF6D28D9
+          HitTest = False
+          Position.X = 20.000000000000000000
+          Position.Y = 24.000000000000000000
+          Size.Width = 40.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Kind = None
+          XRadius = 12.000000000000000000
+          YRadius = 12.000000000000000000
+          object lblLogoIcon: TLabel
+            Align = Client
+            StyledSettings = []
+            Size.Width = 40.000000000000000000
+            Size.Height = 40.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 20.000000000000000000
+            TextSettings.FontColor = claWhite
+            TextSettings.HorzAlign = Center
+            Text = #9733
+          end
+        end
+        object lblLogoTitulo: TLabel
+          StyledSettings = []
+          Position.X = 72.000000000000000000
+          Position.Y = 26.000000000000000000
+          Size.Width = 150.000000000000000000
+          Size.Height = 20.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.Font.Size = 15.000000000000000000
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
+          TextSettings.FontColor = xFF1E293B
+          Text = 'PARQUE'
+        end
+        object lblLogoSub: TLabel
+          StyledSettings = []
+          Position.X = 72.000000000000000000
+          Position.Y = 46.000000000000000000
+          Size.Width = 150.000000000000000000
+          Size.Height = 16.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.Font.Size = 11.000000000000000000
+          TextSettings.FontColor = xFF64748B
+          Text = 'INFANTIL'
+        end
+      end
+      object lblMenuCap: TLabel
+        Align = Top
+        StyledSettings = []
+        Margins.Left = 24.000000000000000000
+        Margins.Top = 8.000000000000000000
+        Position.X = 24.000000000000000000
+        Position.Y = 92.000000000000000000
+        Size.Width = 216.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.Font.Size = 11.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        TextSettings.FontColor = xFF94A3B8
+        Text = 'MENU'
+      end
+      object LayoutMenu: TLayout
+        Align = Client
+        Margins.Top = 4.000000000000000000
+        Size.Width = 239.000000000000000000
+        Size.Height = 820.000000000000000000
+        Size.PlatformDefault = False
+        object ItemVenda: TRectangle
+          Align = Top
+          Cursor = crHandPoint
+          Fill.Color = xFFEDE9FE
+          Margins.Left = 12.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 12.000000000000000000
+          Position.X = 12.000000000000000000
+          Position.Y = 4.000000000000000000
+          Size.Width = 215.000000000000000000
+          Size.Height = 48.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Kind = None
+          XRadius = 12.000000000000000000
+          YRadius = 12.000000000000000000
+          OnClick = MenuItemClick
+          object lblIconVenda: TLabel
+            Align = Left
+            StyledSettings = []
+            Size.Width = 44.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.FontColor = xFF6D28D9
+            TextSettings.HorzAlign = Center
+            Text = #9679
+          end
+          object lblTextVenda: TLabel
+            Align = Client
+            StyledSettings = []
+            Size.Width = 171.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 13.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.FontColor = xFF6D28D9
+            Text = 'Venda'
+          end
+        end
+        object ItemProdutos: TRectangle
+          Tag = 1
+          Align = Top
+          Cursor = crHandPoint
+          Fill.Kind = None
+          Margins.Left = 12.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 12.000000000000000000
+          Position.X = 12.000000000000000000
+          Position.Y = 56.000000000000000000
+          Size.Width = 215.000000000000000000
+          Size.Height = 48.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Kind = None
+          XRadius = 12.000000000000000000
+          YRadius = 12.000000000000000000
+          OnClick = MenuItemClick
+          object lblIconProdutos: TLabel
+            Align = Left
+            StyledSettings = []
+            Size.Width = 44.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.FontColor = xFF64748B
+            TextSettings.HorzAlign = Center
+            Text = #9638
+          end
+          object lblTextProdutos: TLabel
+            Align = Client
+            StyledSettings = []
+            Size.Width = 171.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 13.000000000000000000
+            TextSettings.FontColor = xFF64748B
+            Text = 'Produtos'
+          end
+        end
+        object ItemClientes: TRectangle
+          Tag = 2
+          Align = Top
+          Cursor = crHandPoint
+          Fill.Kind = None
+          Margins.Left = 12.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 12.000000000000000000
+          Position.X = 12.000000000000000000
+          Position.Y = 108.000000000000000000
+          Size.Width = 215.000000000000000000
+          Size.Height = 48.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Kind = None
+          XRadius = 12.000000000000000000
+          YRadius = 12.000000000000000000
+          OnClick = MenuItemClick
+          object lblIconClientes: TLabel
+            Align = Left
+            StyledSettings = []
+            Size.Width = 44.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.FontColor = xFF64748B
+            TextSettings.HorzAlign = Center
+            Text = #9677
+          end
+          object lblTextClientes: TLabel
+            Align = Client
+            StyledSettings = []
+            Size.Width = 171.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 13.000000000000000000
+            TextSettings.FontColor = xFF64748B
+            Text = 'Clientes'
+          end
+        end
+        object ItemIngressos: TRectangle
+          Tag = 3
+          Align = Top
+          Cursor = crHandPoint
+          Fill.Kind = None
+          Margins.Left = 12.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 12.000000000000000000
+          Position.X = 12.000000000000000000
+          Position.Y = 160.000000000000000000
+          Size.Width = 215.000000000000000000
+          Size.Height = 48.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Kind = None
+          XRadius = 12.000000000000000000
+          YRadius = 12.000000000000000000
+          OnClick = MenuItemClick
+          object lblIconIngressos: TLabel
+            Align = Left
+            StyledSettings = []
+            Size.Width = 44.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.FontColor = xFF64748B
+            TextSettings.HorzAlign = Center
+            Text = #9670
+          end
+          object lblTextIngressos: TLabel
+            Align = Client
+            StyledSettings = []
+            Size.Width = 171.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 13.000000000000000000
+            TextSettings.FontColor = xFF64748B
+            Text = 'Ingressos'
+          end
+        end
+        object ItemCaixa: TRectangle
+          Tag = 4
+          Align = Top
+          Cursor = crHandPoint
+          Fill.Kind = None
+          Margins.Left = 12.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 12.000000000000000000
+          Position.X = 12.000000000000000000
+          Position.Y = 212.000000000000000000
+          Size.Width = 215.000000000000000000
+          Size.Height = 48.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Kind = None
+          XRadius = 12.000000000000000000
+          YRadius = 12.000000000000000000
+          OnClick = MenuItemClick
+          object lblIconCaixa: TLabel
+            Align = Left
+            StyledSettings = []
+            Size.Width = 44.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.FontColor = xFF64748B
+            TextSettings.HorzAlign = Center
+            Text = #9635
+          end
+          object lblTextCaixa: TLabel
+            Align = Client
+            StyledSettings = []
+            Size.Width = 171.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 13.000000000000000000
+            TextSettings.FontColor = xFF64748B
+            Text = 'Caixa'
+          end
+        end
+        object ItemRelatorios: TRectangle
+          Tag = 5
+          Align = Top
+          Cursor = crHandPoint
+          Fill.Kind = None
+          Margins.Left = 12.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 12.000000000000000000
+          Position.X = 12.000000000000000000
+          Position.Y = 264.000000000000000000
+          Size.Width = 215.000000000000000000
+          Size.Height = 48.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Kind = None
+          XRadius = 12.000000000000000000
+          YRadius = 12.000000000000000000
+          OnClick = MenuItemClick
+          object lblIconRelatorios: TLabel
+            Align = Left
+            StyledSettings = []
+            Size.Width = 44.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.FontColor = xFF64748B
+            TextSettings.HorzAlign = Center
+            Text = #9636
+          end
+          object lblTextRelatorios: TLabel
+            Align = Client
+            StyledSettings = []
+            Size.Width = 171.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 13.000000000000000000
+            TextSettings.FontColor = xFF64748B
+            Text = 'Relatorios'
+          end
+        end
+        object ItemConfig: TRectangle
+          Tag = 6
+          Align = Top
+          Cursor = crHandPoint
+          Fill.Kind = None
+          Margins.Left = 12.000000000000000000
+          Margins.Top = 4.000000000000000000
+          Margins.Right = 12.000000000000000000
+          Position.X = 12.000000000000000000
+          Position.Y = 316.000000000000000000
+          Size.Width = 215.000000000000000000
+          Size.Height = 48.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Kind = None
+          XRadius = 12.000000000000000000
+          YRadius = 12.000000000000000000
+          OnClick = MenuItemClick
+          object lblIconConfig: TLabel
+            Align = Left
+            StyledSettings = []
+            Size.Width = 44.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.FontColor = xFF64748B
+            TextSettings.HorzAlign = Center
+            Text = #9881
+          end
+          object lblTextConfig: TLabel
+            Align = Client
+            StyledSettings = []
+            Size.Width = 171.000000000000000000
+            Size.Height = 48.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 13.000000000000000000
+            TextSettings.FontColor = xFF64748B
+            Text = 'Configuracoes'
+          end
+        end
+      end
+      object LayoutOperador: TLayout
+        Align = Bottom
+        Position.Y = 940.000000000000000000
+        Size.Width = 240.000000000000000000
+        Size.Height = 140.000000000000000000
+        Size.PlatformDefault = False
+        object RectOperadorSep: TRectangle
+          Align = Top
+          Fill.Color = xFFE2E8F0
+          HitTest = False
+          Margins.Left = 16.000000000000000000
+          Margins.Right = 16.000000000000000000
+          Position.X = 16.000000000000000000
+          Size.Width = 208.000000000000000000
+          Size.Height = 1.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Kind = None
+        end
+        object lblOperadorAvatar: TLabel
+          StyledSettings = []
+          Position.X = 16.000000000000000000
+          Position.Y = 24.000000000000000000
+          Size.Width = 40.000000000000000000
+          Size.Height = 40.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.Font.Size = 24.000000000000000000
+          TextSettings.FontColor = xFF6D28D9
+          TextSettings.HorzAlign = Center
+          Text = #9679
+        end
+        object lblOperadorNome: TLabel
+          StyledSettings = []
+          Position.X = 64.000000000000000000
+          Position.Y = 26.000000000000000000
+          Size.Width = 160.000000000000000000
+          Size.Height = 18.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.Font.Size = 13.000000000000000000
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
+          TextSettings.FontColor = xFF1E293B
+          Text = 'Operador'
+        end
+        object lblOperadorPapel: TLabel
+          StyledSettings = []
+          Position.X = 64.000000000000000000
+          Position.Y = 46.000000000000000000
+          Size.Width = 160.000000000000000000
+          Size.Height = 16.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.Font.Size = 11.000000000000000000
+          TextSettings.FontColor = xFF64748B
+          Text = 'Papel'
+        end
+        object BtnLogout: TRectangle
+          Align = Bottom
+          Cursor = crHandPoint
+          Fill.Color = xFFF1F5F9
+          Margins.Left = 16.000000000000000000
+          Margins.Right = 16.000000000000000000
+          Margins.Bottom = 16.000000000000000000
+          Position.X = 16.000000000000000000
+          Position.Y = 80.000000000000000000
+          Size.Width = 208.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Kind = None
+          XRadius = 12.000000000000000000
+          YRadius = 12.000000000000000000
+          OnClick = BtnLogoutClick
+          object lblLogout: TLabel
+            Align = Client
+            StyledSettings = []
+            Size.Width = 208.000000000000000000
+            Size.Height = 44.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 13.000000000000000000
+            TextSettings.FontColor = xFFEF4444
+            TextSettings.HorzAlign = Center
+            Text = 'Sair do sistema'
+          end
+        end
+      end
+    end
+    object LayoutVenda: TLayout
+      Align = Right
+      Position.X = 1500.000000000000000000
+      Size.Width = 420.000000000000000000
+      Size.Height = 1080.000000000000000000
+      Size.PlatformDefault = False
+      object RectVendaBg: TRectangle
+        Align = Client
+        Fill.Color = claWhite
+        HitTest = False
+        Size.Width = 419.000000000000000000
+        Size.Height = 696.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+      end
+      object RectVendaBorder: TRectangle
+        Align = Left
+        Fill.Color = xFFE2E8F0
+        HitTest = False
+        Position.Y = 64.000000000000000000
+        Size.Width = 1.000000000000000000
+        Size.Height = 696.000000000000000000
+        Size.PlatformDefault = False
+        Stroke.Kind = None
+      end
+      object LayoutVendaHeader: TLayout
+        Align = Top
+        Size.Width = 420.000000000000000000
+        Size.Height = 64.000000000000000000
+        Size.PlatformDefault = False
+        object lblVendaTitulo: TLabel
+          Align = Left
+          StyledSettings = []
+          Margins.Left = 24.000000000000000000
+          Position.X = 24.000000000000000000
+          Size.Width = 300.000000000000000000
+          Size.Height = 64.000000000000000000
+          Size.PlatformDefault = False
+          TextSettings.Font.Size = 18.000000000000000000
+          TextSettings.Font.StyleExt = {00070000000000000004000000}
+          TextSettings.FontColor = xFF1E293B
+          Text = 'Venda atual'
+        end
+      end
+      object LayoutVendaFooter: TLayout
+        Align = Bottom
+        Padding.Left = 20.000000000000000000
+        Padding.Right = 20.000000000000000000
+        Position.Y = 760.000000000000000000
+        Size.Width = 420.000000000000000000
+        Size.Height = 320.000000000000000000
+        Size.PlatformDefault = False
+        object LayoutBotoesSec: TLayout
+          Align = Bottom
+          Margins.Bottom = 16.000000000000000000
+          Position.X = 20.000000000000000000
+          Position.Y = 72.000000000000000000
+          Size.Width = 380.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          object BtnCancelar: TRectangle
+            Align = Left
+            Cursor = crHandPoint
+            Fill.Color = xFFFEF2F2
+            Size.Width = 184.000000000000000000
+            Size.Height = 44.000000000000000000
+            Size.PlatformDefault = False
+            Stroke.Kind = None
+            XRadius = 12.000000000000000000
+            YRadius = 12.000000000000000000
+            OnClick = BtnCancelarClick
+            object lblCancelar: TLabel
+              Align = Client
+              StyledSettings = []
+              Size.Width = 184.000000000000000000
+              Size.Height = 44.000000000000000000
+              Size.PlatformDefault = False
+              TextSettings.Font.Size = 13.000000000000000000
+              TextSettings.FontColor = xFFEF4444
+              TextSettings.HorzAlign = Center
+              Text = 'Cancelar  Esc'
+            end
+          end
+          object BtnSalvar: TRectangle
+            Align = Right
+            Cursor = crHandPoint
+            Fill.Color = xFFEFF6FF
+            Position.X = 196.000000000000000000
+            Size.Width = 184.000000000000000000
+            Size.Height = 44.000000000000000000
+            Size.PlatformDefault = False
+            Stroke.Kind = None
+            XRadius = 12.000000000000000000
+            YRadius = 12.000000000000000000
+            OnClick = BtnSalvarClick
+            object lblSalvar: TLabel
+              Align = Client
+              StyledSettings = []
+              Size.Width = 184.000000000000000000
+              Size.Height = 44.000000000000000000
+              Size.PlatformDefault = False
+              TextSettings.Font.Size = 13.000000000000000000
+              TextSettings.FontColor = xFF3B82F6
+              TextSettings.HorzAlign = Center
+              Text = 'Salvar  F3'
+            end
+          end
+        end
+        object BtnFinalizar: TRectangle
+          Align = Bottom
+          Cursor = crHandPoint
+          Fill.Color = xFF6D28D9
+          Margins.Bottom = 8.000000000000000000
+          Position.X = 20.000000000000000000
+          Position.Y = 252.000000000000000000
+          Size.Width = 380.000000000000000000
+          Size.Height = 60.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Kind = None
+          XRadius = 12.000000000000000000
+          YRadius = 12.000000000000000000
+          OnClick = BtnFinalizarClick
+          object lblFinalizar: TLabel
+            Align = Client
+            StyledSettings = []
+            Size.Width = 380.000000000000000000
+            Size.Height = 60.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.FontColor = claWhite
+            TextSettings.HorzAlign = Center
+            Text = 'Finalizar venda  F5'
+          end
+        end
+        object RowTotal: TLayout
+          Align = Bottom
+          Margins.Bottom = 12.000000000000000000
+          Position.X = 20.000000000000000000
+          Position.Y = 132.000000000000000000
+          Size.Width = 380.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          object lblTotalCap: TLabel
+            Align = Left
+            StyledSettings = []
+            Size.Width = 120.000000000000000000
+            Size.Height = 44.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 16.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.FontColor = xFF1E293B
+            Text = 'Total'
+          end
+          object lblTotalVal: TLabel
+            Align = Right
+            StyledSettings = []
+            Position.X = 140.000000000000000000
+            Size.Width = 240.000000000000000000
+            Size.Height = 44.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 32.000000000000000000
+            TextSettings.Font.StyleExt = {00070000000000000004000000}
+            TextSettings.FontColor = xFF6D28D9
+            TextSettings.HorzAlign = Trailing
+            Text = 'R$ 0,00'
+          end
+        end
+        object RowDesconto: TLayout
+          Align = Bottom
+          Position.X = 20.000000000000000000
+          Position.Y = 20.000000000000000000
+          Size.Width = 380.000000000000000000
+          Size.Height = 26.000000000000000000
+          Size.PlatformDefault = False
+          object lblDescontoCap: TLabel
+            Align = Left
+            StyledSettings = []
+            Size.Width = 120.000000000000000000
+            Size.Height = 26.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 13.000000000000000000
+            TextSettings.FontColor = xFF64748B
+            Text = 'Desconto'
+          end
+          object lblDescontoVal: TLabel
+            Align = Right
+            StyledSettings = []
+            Position.X = 140.000000000000000000
+            Size.Width = 240.000000000000000000
+            Size.Height = 26.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 13.000000000000000000
+            TextSettings.FontColor = xFFEF4444
+            TextSettings.HorzAlign = Trailing
+            Text = '- R$ 0,00'
+          end
+        end
+        object RowSubtotal: TLayout
+          Align = Bottom
+          Position.X = 20.000000000000000000
+          Position.Y = 46.000000000000000000
+          Size.Width = 380.000000000000000000
+          Size.Height = 26.000000000000000000
+          Size.PlatformDefault = False
+          object lblSubtotalCap: TLabel
+            Align = Left
+            StyledSettings = []
+            Size.Width = 120.000000000000000000
+            Size.Height = 26.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 13.000000000000000000
+            TextSettings.FontColor = xFF64748B
+            Text = 'Subtotal'
+          end
+          object lblSubtotalVal: TLabel
+            Align = Right
+            StyledSettings = []
+            Position.X = 140.000000000000000000
+            Size.Width = 240.000000000000000000
+            Size.Height = 26.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 13.000000000000000000
+            TextSettings.FontColor = xFF1E293B
+            TextSettings.HorzAlign = Trailing
+            Text = 'R$ 0,00'
+          end
+        end
+        object RectDesconto: TRectangle
+          Align = Bottom
+          Fill.Color = xFFF8FAFC
+          Margins.Top = 8.000000000000000000
+          Margins.Bottom = 12.000000000000000000
+          Position.X = 20.000000000000000000
+          Position.Y = 196.000000000000000000
+          Size.Width = 380.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = xFFE2E8F0
+          XRadius = 12.000000000000000000
+          YRadius = 12.000000000000000000
+          object EdtDesconto: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Align = Right
+            Text = '0,00'
+            TextSettings.Font.Size = 13.000000000000000000
+            TextSettings.HorzAlign = Trailing
+            Position.X = 274.000000000000000000
+            Position.Y = 6.000000000000000000
+            Margins.Top = 6.000000000000000000
+            Margins.Right = 6.000000000000000000
+            Margins.Bottom = 6.000000000000000000
+            Size.Width = 100.000000000000000000
+            Size.Height = 32.000000000000000000
+            Size.PlatformDefault = False
+            TextPrompt = '0,00'
+            StyledSettings = []
+            OnChangeTracking = EdtDescontoChange
+          end
+          object lblDescontoPerc: TLabel
+            Align = Client
+            StyledSettings = []
+            Margins.Left = 12.000000000000000000
+            Size.Width = 262.000000000000000000
+            Size.Height = 44.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 13.000000000000000000
+            TextSettings.FontColor = xFF94A3B8
+            Text = 'Adicionar desconto'
+          end
+        end
+      end
+      object ScrollItens: TVertScrollBox
+        Align = Client
+        Size.Width = 419.000000000000000000
+        Size.Height = 696.000000000000000000
+        Size.PlatformDefault = False
+        Viewport.Width = 419.000000000000000000
+        Viewport.Height = 696.000000000000000000
+      end
+    end
+    object LayoutCentral: TLayout
+      Align = Client
+      Size.Width = 1260.000000000000000000
+      Size.Height = 1080.000000000000000000
+      Size.PlatformDefault = False
+      object LayoutBusca: TLayout
+        Align = Top
+        Padding.Left = 24.000000000000000000
+        Padding.Top = 16.000000000000000000
+        Padding.Right = 24.000000000000000000
+        Size.Width = 1260.000000000000000000
+        Size.Height = 76.000000000000000000
+        Size.PlatformDefault = False
+        object RectBusca: TRectangle
+          Align = Client
+          Fill.Color = claWhite
+          Size.Width = 1212.000000000000000000
+          Size.Height = 60.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = xFFE2E8F0
+          XRadius = 12.000000000000000000
+          YRadius = 12.000000000000000000
+          object lblBuscaIcon: TLabel
+            Align = Left
+            StyledSettings = []
+            Size.Width = 48.000000000000000000
+            Size.Height = 60.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 18.000000000000000000
+            TextSettings.FontColor = xFF94A3B8
+            TextSettings.HorzAlign = Center
+            Text = #8981
+          end
+          object lblAtalhoF2: TLabel
+            Align = Right
+            StyledSettings = []
+            Margins.Right = 16.000000000000000000
+            Position.X = 1148.000000000000000000
+            Size.Width = 48.000000000000000000
+            Size.Height = 60.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.Font.Size = 11.000000000000000000
+            TextSettings.FontColor = xFF94A3B8
+            TextSettings.HorzAlign = Trailing
+            Text = 'F2'
+          end
+          object EdtBusca: TEdit
+            Touch.InteractiveGestures = [LongTap, DoubleTap]
+            Align = Client
+            TextSettings.Font.Size = 14.000000000000000000
+            Size.Width = 1100.000000000000000000
+            Size.Height = 60.000000000000000000
+            Size.PlatformDefault = False
+            TextPrompt = 'Buscar produto ou servico...'
+            StyledSettings = []
+            OnChangeTracking = EdtBuscaChange
+          end
+        end
+      end
+      object lblProdutosTitulo: TLabel
+        Align = Top
+        StyledSettings = []
+        Margins.Left = 24.000000000000000000
+        Margins.Top = 8.000000000000000000
+        Position.X = 24.000000000000000000
+        Position.Y = 84.000000000000000000
+        Size.Width = 1236.000000000000000000
+        Size.Height = 32.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        TextSettings.FontColor = xFF1E293B
+        Text = 'Produtos'
+      end
+      object LayoutChips: TLayout
+        Align = Top
+        Position.Y = 116.000000000000000000
+        Size.Width = 1260.000000000000000000
+        Size.Height = 52.000000000000000000
+        Size.PlatformDefault = False
+        object ScrollChips: THorzScrollBox
+          Align = Client
+          Margins.Left = 24.000000000000000000
+          Margins.Right = 24.000000000000000000
+          Size.Width = 1212.000000000000000000
+          Size.Height = 52.000000000000000000
+          Size.PlatformDefault = False
+          ShowScrollBars = False
+          Viewport.Width = 1212.000000000000000000
+          Viewport.Height = 52.000000000000000000
+        end
+      end
+      object LayoutAcoes: TLayout
+        Align = Bottom
+        Padding.Left = 24.000000000000000000
+        Padding.Top = 8.000000000000000000
+        Padding.Right = 24.000000000000000000
+        Padding.Bottom = 16.000000000000000000
+        Position.Y = 1012.000000000000000000
+        Size.Width = 1260.000000000000000000
+        Size.Height = 68.000000000000000000
+        Size.PlatformDefault = False
+        object RectAcoesBar: TRectangle
+          Align = Client
+          Fill.Color = claWhite
+          Size.Width = 1212.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = xFFE2E8F0
+          XRadius = 12.000000000000000000
+          YRadius = 12.000000000000000000
+          object lblAcoesInfo: TLabel
+            Align = Client
+            StyledSettings = []
+            Margins.Left = 16.000000000000000000
+            Size.Width = 980.000000000000000000
+            Size.Height = 44.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.FontColor = xFF64748B
+            Text = 'Caixa: 001   |   Turno: 1   |   Online'
+          end
+          object lblVersao: TLabel
+            Align = Right
+            StyledSettings = []
+            Margins.Right = 16.000000000000000000
+            Position.X = 996.000000000000000000
+            Size.Width = 200.000000000000000000
+            Size.Height = 44.000000000000000000
+            Size.PlatformDefault = False
+            TextSettings.FontColor = xFF94A3B8
+            TextSettings.HorzAlign = Trailing
+            Text = 'Sancto PDV  v1.0.0'
+          end
+        end
+      end
+      object ScrollProdutos: TVertScrollBox
+        Align = Client
+        Margins.Left = 24.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Right = 24.000000000000000000
+        Size.Width = 1212.000000000000000000
+        Size.Height = 840.000000000000000000
+        Size.PlatformDefault = False
+        Viewport.Width = 1212.000000000000000000
+        Viewport.Height = 840.000000000000000000
+        object FlowProdutos: TFlowLayout
+          Align = Top
+          Size.Width = 1212.000000000000000000
+          Size.Height = 700.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 0
+          Justify = Left
+          JustifyLastLine = Left
+          FlowDirection = LeftToRight
+          HorizontalGap = 16.000000000000000000
+          VerticalGap = 16.000000000000000000
+        end
+      end
+    end
+  end
+end

@@ -1,0 +1,213 @@
+object FrmMainBackoffice: TFrmMainBackoffice
+  Left = 0
+  Top = 0
+  Caption = 'SANCTO PDV - Backoffice'
+  ClientHeight = 768
+  ClientWidth = 1024
+  Position = ScreenCenter
+  FormFactor.Width = 1024
+  FormFactor.Height = 768
+  FormFactor.Devices = [Desktop]
+  Fill.Kind = Solid
+  Fill.Color = xFFF5F5F5
+  WindowState = wsMaximized
+  object LayoutPrincipal: TLayout
+    Align = Client
+    object LayoutHeader: TLayout
+      Align = Top
+      Size.Height = 56.000000000000000000
+      Size.PlatformDefault = False
+      object RectHeader: TRectangle
+        Align = Client
+        Fill.Color = xFF283593
+        Stroke.Kind = None
+        HitTest = False
+      end
+      object LblLogo: TLabel
+        Align = Left
+        Margins.Left = 12.000000000000000000
+        Size.Width = 260.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 20.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        TextSettings.FontColor = claWhite
+        TextSettings.HorzAlign = Leading
+        TextSettings.VertAlign = Center
+        Text = 'SANCTO PDV - Backoffice'
+      end
+      object LblColaborador: TLabel
+        Align = Left
+        Margins.Left = 16.000000000000000000
+        Size.Width = 280.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 14.000000000000000000
+        TextSettings.FontColor = xFFECEFF1
+        TextSettings.HorzAlign = Leading
+        TextSettings.VertAlign = Center
+        Text = 'Colaborador (Papel)'
+      end
+      object BtnLogout: TButton
+        Align = Right
+        Margins.Right = 12.000000000000000000
+        Margins.Top = 4.000000000000000000
+        Margins.Bottom = 4.000000000000000000
+        Size.Width = 100.000000000000000000
+        Size.Height = 48.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 14.000000000000000000
+        Text = 'Sair'
+      end
+      object LblHoraHeader: TLabel
+        Align = Right
+        Margins.Right = 12.000000000000000000
+        Size.Width = 80.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 14.000000000000000000
+        TextSettings.FontColor = claWhite
+        TextSettings.HorzAlign = Center
+        TextSettings.VertAlign = Center
+        Text = '00:00:00'
+      end
+    end
+    object LayoutFooter: TLayout
+      Align = Bottom
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      object RectFooter: TRectangle
+        Align = Client
+        Fill.Color = xFF263238
+        Stroke.Kind = None
+        HitTest = False
+      end
+      object LblVersao: TLabel
+        Align = Left
+        Margins.Left = 12.000000000000000000
+        Size.Width = 200.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 11.000000000000000000
+        TextSettings.FontColor = xFFECEFF1
+        TextSettings.HorzAlign = Leading
+        TextSettings.VertAlign = Center
+        Text = 'SANCTO PDV Backoffice v1.0'
+      end
+      object LblHoraFooter: TLabel
+        Align = Right
+        Margins.Right = 12.000000000000000000
+        Size.Width = 120.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 12.000000000000000000
+        TextSettings.FontColor = claWhite
+        TextSettings.HorzAlign = Trailing
+        TextSettings.VertAlign = Center
+        Text = '00:00:00'
+      end
+    end
+    object LayoutSidebar: TLayout
+      Align = Left
+      Size.Width = 90.000000000000000000
+      Size.PlatformDefault = False
+      object RectSidebar: TRectangle
+        Align = Client
+        Fill.Color = xFF3949AB
+        Stroke.Kind = None
+        HitTest = False
+      end
+      object BtnDashboard: TButton
+        Position.X = 7.000000000000000000
+        Position.Y = 8.000000000000000000
+        Size.Width = 76.000000000000000000
+        Size.Height = 64.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 10.000000000000000000
+        TextSettings.WordWrap = True
+        TextSettings.HorzAlign = Center
+        Text = #55357#56522#13#10'Dashboard'
+      end
+      object BtnProdutos: TButton
+        Position.X = 7.000000000000000000
+        Position.Y = 80.000000000000000000
+        Size.Width = 76.000000000000000000
+        Size.Height = 64.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 10.000000000000000000
+        TextSettings.WordWrap = True
+        TextSettings.HorzAlign = Center
+        Text = #55357#56550#13#10'Produtos'
+      end
+      object BtnColaboradores: TButton
+        Position.X = 7.000000000000000000
+        Position.Y = 152.000000000000000000
+        Size.Width = 76.000000000000000000
+        Size.Height = 64.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 10.000000000000000000
+        TextSettings.WordWrap = True
+        TextSettings.HorzAlign = Center
+        Text = #55357#56421#13#10'Equipe'
+      end
+      object BtnFiscal: TButton
+        Position.X = 7.000000000000000000
+        Position.Y = 224.000000000000000000
+        Size.Width = 76.000000000000000000
+        Size.Height = 64.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 10.000000000000000000
+        TextSettings.WordWrap = True
+        TextSettings.HorzAlign = Center
+        Text = #55357#56541#13#10'Fiscal'
+      end
+      object BtnRelatorios: TButton
+        Position.X = 7.000000000000000000
+        Position.Y = 296.000000000000000000
+        Size.Width = 76.000000000000000000
+        Size.Height = 64.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 10.000000000000000000
+        TextSettings.WordWrap = True
+        TextSettings.HorzAlign = Center
+        Text = #55357#56520#13#10'Relat.'
+      end
+      object BtnConfiguracoes: TButton
+        Position.X = 7.000000000000000000
+        Position.Y = 368.000000000000000000
+        Size.Width = 76.000000000000000000
+        Size.Height = 64.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 10.000000000000000000
+        TextSettings.WordWrap = True
+        TextSettings.HorzAlign = Center
+        Text = #9881#13#10'Config.'
+      end
+    end
+    object LayoutContent: TLayout
+      Align = Client
+      object LblContentPlaceholder: TLabel
+        Align = Center
+        Size.Width = 400.000000000000000000
+        Size.Height = 100.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 24.000000000000000000
+        TextSettings.FontColor = xFF757575
+        TextSettings.HorzAlign = Center
+        TextSettings.VertAlign = Center
+        Text = 'Dashboard'
+      end
+    end
+  end
+  object TimerRelogio: TTimer
+    Interval = 1000
+  end
+end

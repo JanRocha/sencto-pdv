@@ -1,0 +1,250 @@
+object FrmVisitantes: TFrmVisitantes
+  Left = 0
+  Top = 0
+  Caption = 'Visitantes'
+  ClientHeight = 700
+  ClientWidth = 1024
+  Position = ScreenCenter
+  BorderStyle = Sizeable
+  Fill.Kind = Solid
+  Fill.Color = $FFF5F5F5
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object LayoutPrincipal: TLayout
+    Align = Client
+    Padding.Left = 8.000000000000000000
+    Padding.Top = 8.000000000000000000
+    Padding.Right = 8.000000000000000000
+    Padding.Bottom = 8.000000000000000000
+    Size.Width = 1024.000000000000000000
+    Size.Height = 700.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object LayoutNovaEntrada: TLayout
+      Align = Right
+      Size.Width = 320.000000000000000000
+      Size.Height = 684.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      object RectNovaEntradaHeader: TRectangle
+        Align = Top
+        Size.Width = 320.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        Fill.Kind = Solid
+        Fill.Color = $FF388E3C
+        Stroke.Kind = None
+        XRadius = 4.000000000000000000
+        YRadius = 4.000000000000000000
+        object LblNovaEntradaTitle: TLabel
+          Align = Client
+          Margins.Left = 12.000000000000000000
+          Size.Width = 308.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 16.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = $FFFFFFFF
+          TextSettings.VertAlign = Center
+          Text = 'Nova Entrada'
+          TabOrder = 0
+        end
+      end
+      object ScrollNovaEntrada: TVertScrollBox
+        Align = Client
+        Margins.Top = 4.000000000000000000
+        Size.Width = 320.000000000000000000
+        Size.Height = 636.000000000000000000
+        Size.PlatformDefault = False
+        ShowScrollBars = True
+        TabOrder = 1
+        object LblCPF: TLabel
+          Position.X = 8.000000000000000000
+          Position.Y = 8.000000000000000000
+          Size.Width = 280.000000000000000000
+          Size.Height = 20.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 12.000000000000000000
+          TextSettings.FontColor = $FF212121
+          Text = 'CPF do Tutor:'
+          TabOrder = 0
+        end
+        object EdtCPF: TEdit
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          Position.X = 8.000000000000000000
+          Position.Y = 30.000000000000000000
+          Size.Width = 200.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 14.000000000000000000
+          TextPrompt = '000.000.000-00'
+          TabOrder = 1
+        end
+        object BtnBuscarCPF: TButton
+          Position.X = 212.000000000000000000
+          Position.Y = 30.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 12.000000000000000000
+          Text = 'Buscar'
+          TabOrder = 2
+        end
+        object LblTutorNome: TLabel
+          Position.X = 8.000000000000000000
+          Position.Y = 66.000000000000000000
+          Size.Width = 280.000000000000000000
+          Size.Height = 20.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 12.000000000000000000
+          TextSettings.FontColor = $FF212121
+          Text = 'Nome do Tutor:'
+          TabOrder = 3
+        end
+        object EdtTutorNome: TEdit
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          Position.X = 8.000000000000000000
+          Position.Y = 88.000000000000000000
+          Size.Width = 284.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 14.000000000000000000
+          TextPrompt = 'Nome completo'
+          TabOrder = 4
+        end
+        object LblTelefone: TLabel
+          Position.X = 8.000000000000000000
+          Position.Y = 124.000000000000000000
+          Size.Width = 280.000000000000000000
+          Size.Height = 20.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 12.000000000000000000
+          TextSettings.FontColor = $FF212121
+          Text = 'Telefone:'
+          TabOrder = 5
+        end
+        object EdtTutorTelefone: TEdit
+          Touch.InteractiveGestures = [LongTap, DoubleTap]
+          Position.X = 8.000000000000000000
+          Position.Y = 146.000000000000000000
+          Size.Width = 284.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 14.000000000000000000
+          TextPrompt = '(11) 99999-0000'
+          TabOrder = 6
+        end
+        object LblCrianca: TLabel
+          Position.X = 8.000000000000000000
+          Position.Y = 186.000000000000000000
+          Size.Width = 280.000000000000000000
+          Size.Height = 20.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 12.000000000000000000
+          TextSettings.FontColor = $FF212121
+          Text = 'Crian'#231'a:'
+          TabOrder = 7
+        end
+        object CmbCrianca: TComboBox
+          Position.X = 8.000000000000000000
+          Position.Y = 208.000000000000000000
+          Size.Width = 284.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 8
+        end
+        object LblTicket: TLabel
+          Position.X = 8.000000000000000000
+          Position.Y = 248.000000000000000000
+          Size.Width = 280.000000000000000000
+          Size.Height = 20.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 12.000000000000000000
+          TextSettings.FontColor = $FF212121
+          Text = 'Ticket:'
+          TabOrder = 9
+        end
+        object CmbTicket: TComboBox
+          Position.X = 8.000000000000000000
+          Position.Y = 270.000000000000000000
+          Size.Width = 284.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 10
+        end
+        object BtnIniciarVisita: TButton
+          Position.X = 8.000000000000000000
+          Position.Y = 318.000000000000000000
+          Size.Width = 284.000000000000000000
+          Size.Height = 48.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 16.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          Text = 'Iniciar Visita'
+          TabOrder = 11
+        end
+      end
+    end
+    object LayoutVisitasAtivas: TLayout
+      Align = Client
+      Margins.Right = 8.000000000000000000
+      Size.Width = 680.000000000000000000
+      Size.Height = 684.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      object RectVisitasHeader: TRectangle
+        Align = Top
+        Size.Width = 680.000000000000000000
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        Fill.Kind = Solid
+        Fill.Color = $FF1565C0
+        Stroke.Kind = None
+        XRadius = 4.000000000000000000
+        YRadius = 4.000000000000000000
+        object LblVisitasTitle: TLabel
+          Align = Client
+          Margins.Left = 12.000000000000000000
+          Size.Width = 668.000000000000000000
+          Size.Height = 44.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 16.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = $FFFFFFFF
+          TextSettings.VertAlign = Center
+          Text = 'Visitas Ativas'
+          TabOrder = 0
+        end
+      end
+      object ScrollVisitas: TVertScrollBox
+        Align = Client
+        Margins.Top = 4.000000000000000000
+        Size.Width = 680.000000000000000000
+        Size.Height = 636.000000000000000000
+        Size.PlatformDefault = False
+        ShowScrollBars = True
+        TabOrder = 1
+      end
+    end
+  end
+  object TimerCountdown: TTimer
+    Interval = 1000
+    Enabled = True
+    Left = 496
+    Top = 352
+  end
+end

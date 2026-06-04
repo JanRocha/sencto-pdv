@@ -1,0 +1,202 @@
+object FrmVendas: TFrmVendas
+  Align = Client
+  Size.Width = 944.000000000000000000
+  Size.Height = 672.000000000000000000
+  Size.PlatformDefault = False
+  object LayoutPrincipal: TLayout
+    Align = Client
+    Size.Width = 944.000000000000000000
+    Size.Height = 672.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object LayoutCategorias: TLayout
+      Align = Left
+      Size.Width = 160.000000000000000000
+      Size.Height = 672.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      object RectCategorias: TRectangle
+        Align = Client
+        Fill.Kind = Solid
+        Fill.Color = $FFE3F2FD
+        Stroke.Kind = None
+        HitTest = False
+        Size.Width = 160.000000000000000000
+        Size.Height = 672.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object ScrollCategorias: TVertScrollBox
+        Align = Client
+        Size.Width = 160.000000000000000000
+        Size.Height = 672.000000000000000000
+        Size.PlatformDefault = False
+        ShowScrollBars = False
+        TabOrder = 0
+      end
+    end
+    object LayoutCarrinho: TLayout
+      Align = Right
+      Size.Width = 300.000000000000000000
+      Size.Height = 672.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      object RectCarrinho: TRectangle
+        Align = Client
+        Fill.Kind = Solid
+        Fill.Color = $FFFFFFFF
+        Stroke.Kind = None
+        HitTest = False
+        Size.Width = 300.000000000000000000
+        Size.Height = 672.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object LblCarrinhoTitulo: TLabel
+        Align = Top
+        Margins.Top = 8.000000000000000000
+        Size.Width = 300.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.Font.Style = [fsBold]
+        TextSettings.FontColor = $FF212121
+        TextSettings.HorzAlign = Center
+        TextSettings.VertAlign = Center
+        Text = 'Carrinho'
+        TabOrder = 0
+      end
+      object LayoutCarrinhoFooter: TLayout
+        Align = Bottom
+        Size.Width = 300.000000000000000000
+        Size.Height = 200.000000000000000000
+        Size.PlatformDefault = False
+        Padding.Left = 8.000000000000000000
+        Padding.Right = 8.000000000000000000
+        Padding.Bottom = 8.000000000000000000
+        TabOrder = 1
+        object RectSeparador: TRectangle
+          Align = Top
+          Size.Width = 284.000000000000000000
+          Size.Height = 1.000000000000000000
+          Size.PlatformDefault = False
+          Fill.Kind = Solid
+          Fill.Color = $FFE0E0E0
+          Stroke.Kind = None
+          HitTest = False
+          Margins.Bottom = 8.000000000000000000
+        end
+        object LblSubtotal: TLabel
+          Align = Top
+          Size.Width = 284.000000000000000000
+          Size.Height = 24.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 14.000000000000000000
+          TextSettings.FontColor = $FF616161
+          TextSettings.HorzAlign = Trailing
+          Text = 'Subtotal: R$ 0,00'
+          TabOrder = 0
+        end
+        object LblDesconto: TLabel
+          Align = Top
+          Margins.Top = 4.000000000000000000
+          Size.Width = 284.000000000000000000
+          Size.Height = 24.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 14.000000000000000000
+          TextSettings.FontColor = $FF616161
+          TextSettings.HorzAlign = Leading
+          Text = 'Desconto:'
+          TabOrder = 1
+        end
+        object EdtDesconto: TEdit
+          Align = Top
+          Margins.Bottom = 4.000000000000000000
+          Size.Width = 284.000000000000000000
+          Size.Height = 32.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 14.000000000000000000
+          FilterChar = '0123456789,'
+          Text = '0,00'
+          TabOrder = 0
+        end
+        object LblTotal: TLabel
+          Align = Top
+          Margins.Bottom = 8.000000000000000000
+          Size.Width = 284.000000000000000000
+          Size.Height = 30.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 20.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = $FF1B5E20
+          TextSettings.HorzAlign = Trailing
+          Text = 'TOTAL: R$ 0,00'
+          TabOrder = 2
+        end
+        object BtnCancelar: TButton
+          Align = Left
+          Margins.Right = 8.000000000000000000
+          Size.Width = 130.000000000000000000
+          Size.Height = 48.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 18.000000000000000000
+          TextSettings.FontColor = $FFFFFFFF
+          Text = 'Cancelar'
+          TabOrder = 3
+        end
+        object BtnPagar: TButton
+          Align = Client
+          Size.Height = 48.000000000000000000
+          Size.PlatformDefault = False
+          StyledSettings = []
+          TextSettings.Font.Size = 18.000000000000000000
+          TextSettings.Font.Style = [fsBold]
+          TextSettings.FontColor = $FFFFFFFF
+          Text = 'Pagar'
+          TabOrder = 4
+        end
+      end
+      object ScrollCarrinhoItens: TVertScrollBox
+        Align = Client
+        Size.Width = 300.000000000000000000
+        Size.Height = 432.000000000000000000
+        Size.PlatformDefault = False
+        ShowScrollBars = True
+        TabOrder = 2
+      end
+    end
+    object LayoutProdutos: TLayout
+      Align = Client
+      Size.Width = 484.000000000000000000
+      Size.Height = 672.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+      object ScrollProdutos: TVertScrollBox
+        Align = Client
+        Size.Width = 484.000000000000000000
+        Size.Height = 672.000000000000000000
+        Size.PlatformDefault = False
+        ShowScrollBars = True
+        TabOrder = 0
+        object FlowProdutos: TFlowLayout
+          Align = Top
+          Size.Width = 484.000000000000000000
+          Size.Height = 600.000000000000000000
+          Size.PlatformDefault = False
+          Justify = Left
+          JustifyLastLine = Left
+          HorizontalGap = 8.000000000000000000
+          VerticalGap = 8.000000000000000000
+          Padding.Left = 8.000000000000000000
+          Padding.Top = 8.000000000000000000
+          Padding.Right = 8.000000000000000000
+          Padding.Bottom = 8.000000000000000000
+        end
+      end
+    end
+  end
+end

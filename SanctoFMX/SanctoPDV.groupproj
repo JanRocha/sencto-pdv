@@ -1,0 +1,49 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{F0E1D2C3-B4A5-9687-7654-321FEDCBA098}</ProjectGuid>
+        <ProjectVersion>18.2</ProjectVersion>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="PDV\SanctoPDV_PDV.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Backoffice\SanctoPDV_Backoffice.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType>GroupProj</Borland.ProjectType>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="SanctoPDV_PDV">
+        <MSBuild Projects="PDV\SanctoPDV_PDV.dproj"/>
+    </Target>
+    <Target Name="SanctoPDV_PDV:Clean">
+        <MSBuild Projects="PDV\SanctoPDV_PDV.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SanctoPDV_PDV:Make">
+        <MSBuild Projects="PDV\SanctoPDV_PDV.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SanctoPDV_Backoffice">
+        <MSBuild Projects="Backoffice\SanctoPDV_Backoffice.dproj"/>
+    </Target>
+    <Target Name="SanctoPDV_Backoffice:Clean">
+        <MSBuild Projects="Backoffice\SanctoPDV_Backoffice.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SanctoPDV_Backoffice:Make">
+        <MSBuild Projects="Backoffice\SanctoPDV_Backoffice.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="SanctoPDV_PDV;SanctoPDV_Backoffice"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="SanctoPDV_PDV:Clean;SanctoPDV_Backoffice:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="SanctoPDV_PDV:Make;SanctoPDV_Backoffice:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

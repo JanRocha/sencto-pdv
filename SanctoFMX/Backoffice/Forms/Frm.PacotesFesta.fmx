@@ -1,0 +1,157 @@
+object FrmPacotesFesta: TFrmPacotesFesta
+  Left = 0
+  Top = 0
+  Caption = 'Backoffice - Pacotes de Festa'
+  ClientHeight = 600
+  ClientWidth = 900
+  Fill.Kind = Solid
+  Fill.Color = xFFF5F5F5
+  object LayoutPrincipal: TLayout
+    Align = Client
+    Padding.Left = 16.000000000000000000
+    Padding.Right = 16.000000000000000000
+    Padding.Top = 16.000000000000000000
+    Padding.Bottom = 16.000000000000000000
+    object LayoutHeader: TLayout
+      Align = Top
+      Size.Height = 56.000000000000000000
+      Size.PlatformDefault = False
+      Margins.Bottom = 12.000000000000000000
+      object LblTitulo: TLabel
+        Align = Left
+        Size.Width = 300.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 20.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        TextSettings.FontColor = xFF212121
+        TextSettings.VertAlign = Center
+        Text = 'Pacotes de Festa'
+      end
+      object BtnNovoPacote: TButton
+        Align = Right
+        Size.Width = 150.000000000000000000
+        Size.Height = 48.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 14.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Text = '+ Novo Pacote'
+      end
+    end
+    object ScrollLista: TVertScrollBox
+      Align = Client
+      object LayoutLista: TLayout
+        Align = Top
+        Size.Height = 600.000000000000000000
+        Size.PlatformDefault = False
+      end
+    end
+  end
+  object LayoutOverlay: TLayout
+    Align = Client
+    Visible = False
+    object RectOverlayBg: TRectangle
+      Align = Client
+      Fill.Color = xAA000000
+      Stroke.Kind = None
+      HitTest = True
+    end
+    object LayoutFormPanel: TLayout
+      Align = Center
+      Size.Width = 420.000000000000000000
+      Size.Height = 480.000000000000000000
+      Size.PlatformDefault = False
+      object RectFormBg: TRectangle
+        Align = Client
+        Fill.Color = claWhite
+        Stroke.Color = xFFE0E0E0
+        XRadius = 12.000000000000000000
+        YRadius = 12.000000000000000000
+        HitTest = False
+      end
+      object LblFormTitle: TLabel
+        Position.X = 16.000000000000000000
+        Position.Y = 12.000000000000000000
+        Size.Width = 380.000000000000000000
+        Size.Height = 30.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        TextSettings.FontColor = xFF1565C0
+        Text = 'Novo Pacote'
+      end
+      object EdtNome: TEdit
+        Position.X = 16.000000000000000000
+        Position.Y = 50.000000000000000000
+        Size.Width = 350.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 14.000000000000000000
+        TextPrompt = 'Nome do pacote (m'#225'x 80 chars)'
+      end
+      object EdtMaxConvidados: TEdit
+        Position.X = 16.000000000000000000
+        Position.Y = 94.000000000000000000
+        Size.Width = 170.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 14.000000000000000000
+        TextPrompt = 'M'#225'x. convidados (1-200)'
+      end
+      object EdtPrecoSemana: TEdit
+        Position.X = 16.000000000000000000
+        Position.Y = 138.000000000000000000
+        Size.Width = 170.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 14.000000000000000000
+        TextPrompt = 'Pre'#231'o semana (R$)'
+      end
+      object EdtPrecoFDS: TEdit
+        Position.X = 196.000000000000000000
+        Position.Y = 138.000000000000000000
+        Size.Width = 170.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 14.000000000000000000
+        TextPrompt = 'Pre'#231'o FDS (R$)'
+      end
+      object MemoDescricao: TMemo
+        Position.X = 16.000000000000000000
+        Position.Y = 226.000000000000000000
+        Size.Width = 350.000000000000000000
+        Size.Height = 80.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 13.000000000000000000
+      end
+      object BtnSalvar: TButton
+        Position.X = 16.000000000000000000
+        Position.Y = 390.000000000000000000
+        Size.Width = 170.000000000000000000
+        Size.Height = 48.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 14.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        Text = 'Salvar'
+      end
+      object BtnCancelarForm: TButton
+        Position.X = 196.000000000000000000
+        Position.Y = 390.000000000000000000
+        Size.Width = 170.000000000000000000
+        Size.Height = 48.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 14.000000000000000000
+        Text = 'Cancelar'
+      end
+    end
+  end
+end

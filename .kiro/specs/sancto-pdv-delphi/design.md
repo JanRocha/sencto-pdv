@@ -2,10 +2,9 @@
 
 ## Overview
 
-O Sancto PDV é um sistema de Ponto de Venda para parques temáticos infantis indoor, composto por dois executáveis Delphi 10.2 Tokyo com interface FireMonkey (FMX):
+O Sancto PDV é um sistema unificado de Ponto de Venda para parques temáticos infantis indoor, composto por um **único executável** Delphi 10.2 Tokyo com interface FireMonkey (FMX):
 
-- **SanctoPDV_PDV.exe** — Operação diária: vendas, caixa, visitantes, festas
-- **SanctoPDV_Backoffice.exe** — Administração: produtos, colaboradores, fiscal, relatórios, configurações
+- **SanctoPDV_PDV.exe** — Aplicação unificada que centraliza operação diária (vendas, caixa, visitantes, festas) e administração (produtos, colaboradores, fiscal, relatórios, configurações), com controle de acesso baseado em papéis.
 
 O sistema utiliza **FenixORM** (modo local com FireDAC + Firebird) para persistência, **ACBr** para emissão fiscal (NFC-e/NF-e), e **RESTRequest4Delphi** para integrações REST (WhatsApp Business API e ERP Omie).
 
@@ -19,9 +18,8 @@ A primeira entrega será um **MOCK funcional** com `TObjectList<T>` em memória 
 
 ```mermaid
 graph TB
-    subgraph "Executáveis"
+    subgraph "Executável Único"
         PDV[SanctoPDV_PDV.exe]
-        BO[SanctoPDV_Backoffice.exe]
     end
 
     subgraph "Camada Shared (Units Compartilhadas)"
@@ -45,7 +43,6 @@ graph TB
     end
 
     PDV --> Controllers
-    BO --> Controllers
     Controllers --> DAO
     Controllers --> MockDAO
     DAO --> FB
@@ -67,61 +64,112 @@ graph LR
     D --> DB[(Firebird)]
 ```
 
-### Separação entre Executáveis
+### Controle de Acesso por Papel (Executável Único)
 
-| Aspecto | SanctoPDV_PDV.exe | SanctoPDV_Backoffice.exe |
-|---------|-------------------|--------------------------|
-| **Papéis** | OPERACIONAL, GERENTE, ADMIN | GERENTE, ADMIN |
-| **Funções** | Vendas, Caixa, Visitantes, Festas | Dashboard, Produtos, Colaboradores, Fiscal, Relatórios, Configurações |
-| **Contexto** | Operação diária em tela touch | Administração em desktop |
-| **ACBr** | Emissão NFC-e/NF-e em tempo real | Configuração de certificado |
-| **WhatsApp** | Disparo de alertas automáticos | Configuração de credenciais |
+| Módulo | OPERACIONAL | GERENTE | ADMINISTRADOR |
+|--------|:-----------:|:-------:|:-------------:|
+| **Vendas** | ✓ | ✓ | ✓ |
+| **Caixa** | ✓ | ✓ | ✓ |
+| **Visitantes** | ✓ | ✓ | ✓ |
+| **Festas** | — | ✓ | ✓ |
+| **Dashboard** | — | ✓ | ✓ |
+| **Produtos** | — | ✓ | ✓ |
+| **Colaboradores** | — | — | ✓ |
+| **Fiscal** | — | ✓ | ✓ |
+| **Relatórios** | — | ✓ | ✓ |
+| **Configurações** | — | — | ✓ |
+| **Auditoria** | — | ✓ | ✓ |
 
-### Bibliotecas Compartilhadas (Units)
+### Regra de Design-Time: Par .fmx + .pas Obrigatório
 
-Ambos os executáveis referenciam o mesmo conjunto de units em um diretório compartilhado:
+**Todas as telas do sistema DEVEM possuir o par de arquivos `.fmx` (layout visual) + `.pas` (código)**, permitindo edição completa no Form Designer do Delphi IDE.
+
+**Proibido:**
+- Criar componentes visuais em tempo de execução (runtime)
+- Montar layouts dinamicamente via código
+- Usar frames/panels criados por código sem representação no .fmx
+
+**Obrigatório:**
+- Todo componente visual (botões, labels, panels, grids, listviews, edits, etc.) deve ser posicionado no .fmx via Form Designer
+- A propriedade `Visible` pode ser alterada em runtime para controle de acesso por papel, mas o componente deve existir no .fmx
+- Dialogs modais que necessitam de layout próprio também devem ter seu par .fmx + .pas separado
+- O código no .pas deve apenas manipular dados e estado dos componentes já existentes no .fmx
+
+**Motivo:** Manter todas as telas editáveis visualmente na IDE, facilitar manutenção, e permitir ajustes de layout sem recompilar lógica.
+
+### Estrutura de Diretórios do Projeto
 
 ```
-Shared/
-├── Models/
-│   ├── Model.Entidade.Colaborador.pas
-│   ├── Model.Entidade.Produto.pas
-│   ├── Model.Entidade.Categoria.pas
-│   ├── Model.Entidade.Caixa.pas
-│   ├── Model.Entidade.MovimentacaoCaixa.pas
-│   ├── Model.Entidade.Venda.pas
-│   ├── Model.Entidade.VendaItem.pas
-│   ├── Model.Entidade.Visitante.pas
-│   ├── Model.Entidade.Visita.pas
-│   ├── Model.Entidade.VisitaConsumo.pas
-│   ├── Model.Entidade.Tutor.pas
-│   ├── Model.Entidade.Ticket.pas
-│   ├── Model.Entidade.Festa.pas
-│   ├── Model.Entidade.PacoteFesta.pas
-│   ├── Model.Entidade.FestaPagamento.pas
-│   ├── Model.Entidade.NotaFiscal.pas
-│   ├── Model.Entidade.Configuracao.pas
-│   └── Model.Entidade.LogAuditoria.pas
-├── Controllers/
-│   ├── Controller.Base.pas
-│   ├── Controller.Colaborador.pas
-│   ├── Controller.Produto.pas
-│   ├── Controller.Caixa.pas
-│   ├── Controller.Venda.pas
-│   ├── Controller.Visitante.pas
-│   ├── Controller.Festa.pas
-│   ├── Controller.Fiscal.pas
-│   ├── Controller.Relatorio.pas
-│   ├── Controller.Configuracao.pas
-│   └── Controller.Auditoria.pas
-├── Services/
-│   ├── Service.Autenticacao.pas
-│   ├── Service.WhatsApp.pas
-│   ├── Service.Omie.pas
-│   └── Service.Fiscal.pas
-├── Mock/
-│   └── Mock.DAO.pas
-└── ORM/
+SanctoFMX/
+├── PDV/
+│   ├── SanctoPDV_PDV.dpr
+│   ├── SanctoPDV_PDV.dproj
+│   └── Forms/
+│       ├── Frm.PDV.fmx + .pas              (container principal)
+│       ├── Frm.Main.PDV.fmx + .pas         (tela principal com navegação)
+│       ├── Frm.Vendas.fmx + .pas           (vendas com 3 painéis)
+│       ├── Frm.Caixa.fmx + .pas            (controle de caixa)
+│       ├── Frm.Visitantes.fmx + .pas       (visitantes com timer)
+│       ├── Frm.Festas.fmx + .pas           (agendamento de festas)
+│       ├── Frm.Dashboard.fmx + .pas        (indicadores — ADM/GER)
+│       ├── Frm.Produtos.fmx + .pas         (CRUD produtos — ADM/GER)
+│       ├── Frm.Colaboradores.fmx + .pas    (CRUD colaboradores — ADM)
+│       ├── Frm.PacotesFesta.fmx + .pas     (pacotes de festa — ADM)
+│       ├── Frm.Fiscal.fmx + .pas           (config fiscal — ADM/GER)
+│       ├── Frm.Relatorios.fmx + .pas       (relatórios — ADM/GER)
+│       ├── Frm.Configuracoes.fmx + .pas    (config sistema — ADM)
+│       └── Frm.Auditoria.fmx + .pas        (log auditoria — ADM/GER)
+├── Shared/
+│   ├── Models/
+│   │   ├── Model.Entidade.Colaborador.pas
+│   │   ├── Model.Entidade.Produto.pas
+│   │   ├── Model.Entidade.Categoria.pas
+│   │   ├── Model.Entidade.Caixa.pas
+│   │   ├── Model.Entidade.MovimentacaoCaixa.pas
+│   │   ├── Model.Entidade.Venda.pas
+│   │   ├── Model.Entidade.VendaItem.pas
+│   │   ├── Model.Entidade.Visitante.pas
+│   │   ├── Model.Entidade.Visita.pas
+│   │   ├── Model.Entidade.VisitaConsumo.pas
+│   │   ├── Model.Entidade.Tutor.pas
+│   │   ├── Model.Entidade.Ticket.pas
+│   │   ├── Model.Entidade.Festa.pas
+│   │   ├── Model.Entidade.PacoteFesta.pas
+│   │   ├── Model.Entidade.FestaPagamento.pas
+│   │   ├── Model.Entidade.NotaFiscal.pas
+│   │   ├── Model.Entidade.Configuracao.pas
+│   │   ├── Model.Entidade.LogAuditoria.pas
+│   │   └── Model.Entidade.NotificacaoWhatsApp.pas
+│   ├── Controllers/
+│   │   ├── Controller.Base.pas
+│   │   ├── Controller.Colaborador.pas
+│   │   ├── Controller.Produto.pas
+│   │   ├── Controller.Caixa.pas
+│   │   ├── Controller.Venda.pas
+│   │   ├── Controller.Visitante.pas
+│   │   ├── Controller.Festa.pas
+│   │   ├── Controller.Fiscal.pas
+│   │   ├── Controller.Relatorio.pas
+│   │   ├── Controller.Configuracao.pas
+│   │   └── Controller.Auditoria.pas
+│   ├── Services/
+│   │   ├── Service.Autenticacao.pas
+│   │   ├── Service.WhatsApp.pas
+│   │   ├── Service.Omie.pas
+│   │   └── Service.Fiscal.pas
+│   ├── Mock/
+│   │   └── Mock.DAO.pas
+│   ├── Forms/
+│   │   └── Frm.Login.fmx + .pas
+│   ├── Utils/
+│   │   ├── Rtti.Atributos.pas
+│   │   ├── Utils.Exceptions.pas
+│   │   └── Utils.Theme.pas
+│   └── ORM/
+│       ├── FenixORM.pas
+│       ├── FenixRTTI.pas
+│       └── FenixSQL.pas
+└── ORM/ (FenixORM original)
     ├── FenixORM.pas
     ├── FenixRTTI.pas
     └── FenixSQL.pas
@@ -249,7 +297,7 @@ type
 
   TServiceFiscal = class
   private
-    FACBrNFe: TACBrNFe; // Componente ACBr
+    FACBrNFe: TACBrNFe;
     FConfiguracao: TConfiguracaoFiscal;
     procedure ConfigurarACBr;
     procedure PreencherNFe(AVenda: TVenda; AItens: TObjectList<TVendaItem>);
@@ -292,38 +340,6 @@ type
   end;
 ```
 
-**Implementação com RESTRequest4Delphi:**
-
-```pascal
-function TServiceWhatsApp.EnviarAlertaExpiracao(...): TResultadoWhatsApp;
-begin
-  if not FConfigurado then
-  begin
-    Result.Sucesso := False;
-    Result.CodigoErro := 'NAO_CONFIGURADA';
-    Exit;
-  end;
-
-  var lPayload := MontarPayload(ANomeCrianca, AMinutosRestantes, ATelefoneTutor);
-  
-  var lResponse := TRequest.New
-    .BaseURL('https://graph.facebook.com/v17.0/' + FPhoneNumberId + '/messages')
-    .TokenBearer(FToken)
-    .ContentType('application/json')
-    .AddBody(lPayload)
-    .Post;
-
-  Result.Sucesso := lResponse.StatusCode = 200;
-  if Result.Sucesso then
-    Result.MessageId := {extrair do JSON de resposta}
-  else
-  begin
-    Result.CodigoErro := IntToStr(lResponse.StatusCode);
-    Result.MensagemErro := lResponse.Content;
-  end;
-end;
-```
-
 ### Service.Omie (RESTRequest4Delphi)
 
 ```pascal
@@ -351,52 +367,96 @@ type
   end;
 ```
 
-### Estrutura de Forms FMX
+### Estrutura de Forms FMX (Executável Único)
 
 ```mermaid
 graph TB
-    subgraph "PDV Forms"
-        FrmLoginPDV[Frm.Login.PDV]
-        FrmMainPDV[Frm.Main.PDV]
+    subgraph "Autenticação"
+        FrmLogin[Frm.Login]
+    end
+
+    subgraph "Container Principal"
+        FrmPDV[Frm.PDV - Container]
+    end
+
+    subgraph "Módulo Operacional (todos os papéis)"
         FrmVendas[Frm.Vendas]
         FrmCaixa[Frm.Caixa]
         FrmVisitantes[Frm.Visitantes]
+    end
+
+    subgraph "Módulo Operacional (GERENTE + ADM)"
         FrmFestas[Frm.Festas]
     end
 
-    subgraph "Backoffice Forms"
-        FrmLoginBO[Frm.Login.Backoffice]
-        FrmMainBO[Frm.Main.Backoffice]
+    subgraph "Módulo Administrativo (GERENTE + ADM)"
         FrmDashboard[Frm.Dashboard]
         FrmProdutos[Frm.Produtos]
-        FrmColaboradores[Frm.Colaboradores]
         FrmFiscal[Frm.Fiscal]
         FrmRelatorios[Frm.Relatorios]
+        FrmAuditoria[Frm.Auditoria]
+    end
+
+    subgraph "Módulo Administrativo (ADM apenas)"
+        FrmColaboradores[Frm.Colaboradores]
         FrmConfiguracoes[Frm.Configuracoes]
     end
 
-    FrmLoginPDV --> FrmMainPDV
-    FrmMainPDV --> FrmVendas
-    FrmMainPDV --> FrmCaixa
-    FrmMainPDV --> FrmVisitantes
-    FrmMainPDV --> FrmFestas
-
-    FrmLoginBO --> FrmMainBO
-    FrmMainBO --> FrmDashboard
-    FrmMainBO --> FrmProdutos
-    FrmMainBO --> FrmColaboradores
-    FrmMainBO --> FrmFiscal
-    FrmMainBO --> FrmRelatorios
-    FrmMainBO --> FrmConfiguracoes
+    FrmLogin --> FrmPDV
+    FrmPDV --> FrmVendas
+    FrmPDV --> FrmCaixa
+    FrmPDV --> FrmVisitantes
+    FrmPDV --> FrmFestas
+    FrmPDV --> FrmDashboard
+    FrmPDV --> FrmProdutos
+    FrmPDV --> FrmColaboradores
+    FrmPDV --> FrmFiscal
+    FrmPDV --> FrmRelatorios
+    FrmPDV --> FrmConfiguracoes
+    FrmPDV --> FrmAuditoria
 ```
 
-### Layout da Tela de Vendas (PDV)
+### Layout da Tela Principal (Frm.PDV)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │ Header: Logo | Colaborador Logado | Caixa #ID | [Logout]        │
-├────────┬──────────────────────────────────┬─────────────────────┤
-│        │                                  │                     │
+├────────┬────────────────────────────────────────────────────────┤
+│        │                                                        │
+│  Menu  │            Área de Conteúdo                            │
+│ Lateral│         (Frame/Form embarcado)                         │
+│        │                                                        │
+│ ┌────┐ │                                                        │
+│ │Vend│ │                                                        │
+│ ├────┤ │                                                        │
+│ │Caix│ │                                                        │
+│ ├────┤ │                                                        │
+│ │Visi│ │                                                        │
+│ ├────┤ │                                                        │
+│ │Fest│ │  (visível conforme papel do colaborador)               │
+│ ├────┤ │                                                        │
+│ │Dash│ │                                                        │
+│ ├────┤ │                                                        │
+│ │Prod│ │                                                        │
+│ ├────┤ │                                                        │
+│ │Cola│ │                                                        │
+│ ├────┤ │                                                        │
+│ │Fisc│ │                                                        │
+│ ├────┤ │                                                        │
+│ │Rela│ │                                                        │
+│ ├────┤ │                                                        │
+│ │Conf│ │                                                        │
+│ └────┘ │                                                        │
+├────────┴────────────────────────────────────────────────────────┤
+│ Footer: Status Fiscal | Hora | Alertas                          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Layout da Tela de Vendas
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                  │
 │ Categ. │    Grid de Produtos (Cards)      │   Carrinho          │
 │        │                                  │                     │
 │ [Todos]│  ┌────┐ ┌────┐ ┌────┐ ┌────┐   │   Item 1    R$ X    │
@@ -409,8 +469,6 @@ graph TB
 │        │  │ 05 │ │ 06 │ │ 07 │ │ 08 │   │   TOTAL:    R$ ZZ   │
 │        │  └────┘ └────┘ └────┘ └────┘   │                     │
 │        │                                  │   [Cancelar] [Pagar]│
-├────────┴──────────────────────────────────┴─────────────────────┤
-│ Footer: Status Fiscal | Hora | Alertas                          │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -816,9 +874,7 @@ type
 
 ## Correctness Properties
 
-*Uma propriedade é uma característica ou comportamento que deve ser verdadeiro em todas as execuções válidas de um sistema — essencialmente, uma declaração formal sobre o que o sistema deve fazer. Propriedades servem como ponte entre especificações legíveis por humanos e garantias de corretude verificáveis por máquina.*
-
-**Biblioteca PBT**: DUnitX com geração customizada de dados (não há biblioteca PBT nativa para Delphi, mas utilizaremos geradores de dados aleatórios com loop de 100+ iterações no padrão PBT).
+**Biblioteca PBT**: DUnitX com geração customizada de dados (geradores de dados aleatórios com loop de 100+ iterações no padrão PBT).
 
 ### Property 1: Autenticação aceita credenciais válidas de conta ativa
 
@@ -842,7 +898,7 @@ type
 
 *Para qualquer* colaborador com `Situacao=0` (inativo), *qualquer* tentativa de login deve retornar resultado de rejeição sem revelar o motivo específico.
 
-**Validates: Requirements 1.10**
+**Validates: Requirements 1.8**
 
 ### Property 5: Validação de cadastro de colaborador aceita dados válidos e rejeita inválidos
 
@@ -1200,20 +1256,6 @@ implementation
 // Implementação com Random e regras de domínio
 end.
 ```
-
-### Configuração PBT
-
-- **Mínimo 100 iterações** por propriedade
-- **Tag format**: `// Feature: sancto-pdv-delphi, Property {N}: {título}`
-- **Cada propriedade = 1 test procedure**
-- **Execução**: `dunit.exe` com runner de console para CI
-
-### Testes de Integração
-
-- **ACBr/SEFAZ**: Ambiente de homologação com certificado de teste
-- **WhatsApp API**: Mock de `IResponse` do RESTRequest4Delphi
-- **ERP Omie**: Mock de endpoint REST com respostas pré-configuradas
-- **Firebird**: Banco de teste em memória ou arquivo temporário
 
 ### Cobertura por Requisito
 

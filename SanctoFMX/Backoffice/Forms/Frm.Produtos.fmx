@@ -1,0 +1,102 @@
+object FrmProdutos: TFrmProdutos
+  Align = Client
+  Size.Width = 934.000000000000000000
+  Size.Height = 676.000000000000000000
+  Size.PlatformDefault = False
+  object LayoutPrincipal: TLayout
+    Align = Client
+    object LayoutToolbar: TLayout
+      Align = Top
+      Size.Height = 60.000000000000000000
+      Size.PlatformDefault = False
+      Padding.Left = 8.000000000000000000
+      Padding.Right = 8.000000000000000000
+      object EdtBusca: TEdit
+        Align = Left
+        Size.Width = 300.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 14.000000000000000000
+        TextPrompt = 'Buscar produto (nome, codigo, categoria)...'
+        Margins.Top = 10.000000000000000000
+        Margins.Bottom = 10.000000000000000000
+        Margins.Right = 8.000000000000000000
+      end
+      object BtnNovoProduto: TButton
+        Align = Left
+        Size.Width = 140.000000000000000000
+        Size.Height = 48.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 16.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        TextSettings.FontColor = claWhite
+        Text = '+ Novo Produto'
+        Margins.Top = 6.000000000000000000
+        Margins.Right = 8.000000000000000000
+      end
+      object BtnExportar: TButton
+        Align = Right
+        Size.Width = 130.000000000000000000
+        Size.Height = 48.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 14.000000000000000000
+        TextSettings.FontColor = claWhite
+        Text = 'Exportar Excel'
+        Margins.Top = 6.000000000000000000
+        Margins.Left = 8.000000000000000000
+      end
+      object BtnImportar: TButton
+        Align = Right
+        Size.Width = 130.000000000000000000
+        Size.Height = 48.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 14.000000000000000000
+        TextSettings.FontColor = claWhite
+        Text = 'Importar Excel'
+        Margins.Top = 6.000000000000000000
+        Margins.Left = 8.000000000000000000
+      end
+    end
+    object LayoutFormPanel: TLayout
+      Align = Right
+      Size.Width = 420.000000000000000000
+      Size.PlatformDefault = False
+      Visible = False
+      object RectFormPanel: TRectangle
+        Align = Client
+        Fill.Color = claWhite
+        Stroke.Color = xFFE0E0E0
+        HitTest = False
+      end
+      object LblFormTitulo: TLabel
+        Align = Top
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        TextSettings.FontColor = xFF212121
+        TextSettings.HorzAlign = Center
+        TextSettings.VertAlign = Center
+        Text = 'Novo Produto'
+        Margins.Top = 8.000000000000000000
+      end
+      object ScrollForm: TVertScrollBox
+        Align = Client
+        Padding.Left = 12.000000000000000000
+        Padding.Right = 12.000000000000000000
+        Padding.Top = 4.000000000000000000
+      end
+    end
+    object ScrollGrid: TVertScrollBox
+      Align = Client
+      Margins.Left = 8.000000000000000000
+      Margins.Right = 8.000000000000000000
+      Margins.Top = 4.000000000000000000
+    end
+  end
+end

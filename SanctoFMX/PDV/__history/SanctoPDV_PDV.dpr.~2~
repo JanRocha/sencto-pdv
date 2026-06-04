@@ -1,0 +1,70 @@
+﻿program SanctoPDV_PDV;
+
+uses
+  System.StartUpCopy,
+  System.UITypes,
+  FMX.Forms,
+  Rtti.Atributos in '..\Shared\Utils\Rtti.Atributos.pas',
+  Utils.Exceptions in '..\Shared\Utils\Utils.Exceptions.pas',
+  Utils.Theme in '..\Shared\Utils\Utils.Theme.pas',
+  Mock.DAO in '..\Shared\Mock\Mock.DAO.pas',
+  Model.Entidade.Colaborador in '..\Shared\Models\Model.Entidade.Colaborador.pas',
+  Model.Entidade.Produto in '..\Shared\Models\Model.Entidade.Produto.pas',
+  Model.Entidade.Categoria in '..\Shared\Models\Model.Entidade.Categoria.pas',
+  Model.Entidade.Caixa in '..\Shared\Models\Model.Entidade.Caixa.pas',
+  Model.Entidade.MovimentacaoCaixa in '..\Shared\Models\Model.Entidade.MovimentacaoCaixa.pas',
+  Model.Entidade.Venda in '..\Shared\Models\Model.Entidade.Venda.pas',
+  Model.Entidade.VendaItem in '..\Shared\Models\Model.Entidade.VendaItem.pas',
+  Model.Entidade.Tutor in '..\Shared\Models\Model.Entidade.Tutor.pas',
+  Model.Entidade.Visitante in '..\Shared\Models\Model.Entidade.Visitante.pas',
+  Model.Entidade.Visita in '..\Shared\Models\Model.Entidade.Visita.pas',
+  Model.Entidade.VisitaConsumo in '..\Shared\Models\Model.Entidade.VisitaConsumo.pas',
+  Model.Entidade.Ticket in '..\Shared\Models\Model.Entidade.Ticket.pas',
+  Model.Entidade.Festa in '..\Shared\Models\Model.Entidade.Festa.pas',
+  Model.Entidade.PacoteFesta in '..\Shared\Models\Model.Entidade.PacoteFesta.pas',
+  Model.Entidade.FestaPagamento in '..\Shared\Models\Model.Entidade.FestaPagamento.pas',
+  Model.Entidade.NotaFiscal in '..\Shared\Models\Model.Entidade.NotaFiscal.pas',
+  Model.Entidade.Configuracao in '..\Shared\Models\Model.Entidade.Configuracao.pas',
+  Model.Entidade.LogAuditoria in '..\Shared\Models\Model.Entidade.LogAuditoria.pas',
+  Model.Entidade.NotificacaoWhatsApp in '..\Shared\Models\Model.Entidade.NotificacaoWhatsApp.pas',
+  Controller.Base in '..\Shared\Controllers\Controller.Base.pas',
+  Controller.Colaborador in '..\Shared\Controllers\Controller.Colaborador.pas',
+  Controller.Produto in '..\Shared\Controllers\Controller.Produto.pas',
+  Controller.Venda in '..\Shared\Controllers\Controller.Venda.pas',
+  Controller.Caixa in '..\Shared\Controllers\Controller.Caixa.pas',
+  Controller.Visitante in '..\Shared\Controllers\Controller.Visitante.pas',
+  Controller.Festa in '..\Shared\Controllers\Controller.Festa.pas',
+  Service.Autenticacao in '..\Shared\Services\Service.Autenticacao.pas',
+  Frm.Login in '..\Shared\Forms\Frm.Login.pas',
+  Frm.PDV in 'Forms\Frm.PDV.pas' {FrmPDV};
+
+{$R *.res}
+
+var
+  LFrmLogin: TFrmLogin;
+
+begin
+  Application.Initialize;
+
+  // 1. Exibir login como modal ANTES de criar o PDV
+  LFrmLogin := TFrmLogin.Create(Application);
+  try
+    LFrmLogin.ShowModal;
+
+    if LFrmLogin.ModalResult <> mrOk then
+    begin
+      Application.Terminate;
+      Exit;
+    end;
+
+    // 2. Login OK: criar o PDV ja com os dados do colaborador logado
+    Application.CreateForm(TFrmPDV, FrmPDV);
+    FrmPDV.ColaboradorNome := LFrmLogin.ColaboradorLogadoNome;
+    FrmPDV.ColaboradorPapel := LFrmLogin.ColaboradorLogadoPapel;
+    FrmPDV.CaixaId := 1;
+  finally
+    LFrmLogin.Free;
+  end;
+
+  Application.Run;
+end.

@@ -1,0 +1,114 @@
+object FrmColaboradores: TFrmColaboradores
+  Align = Client
+  Size.Width = 934.000000000000000000
+  Size.Height = 676.000000000000000000
+  Size.PlatformDefault = False
+  object LayoutPrincipal: TLayout
+    Align = Client
+    object LayoutHeader: TLayout
+      Align = Top
+      Size.Height = 60.000000000000000000
+      Size.PlatformDefault = False
+      Padding.Left = 16.000000000000000000
+      Padding.Right = 16.000000000000000000
+      object LblTitulo: TLabel
+        Align = Left
+        Size.Width = 200.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 22.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        TextSettings.FontColor = xFF212121
+        TextSettings.VertAlign = Center
+        Text = 'Colaboradores'
+      end
+      object BtnNovo: TButton
+        Align = Right
+        Size.Width = 160.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 14.000000000000000000
+        TextSettings.FontColor = claWhite
+        Text = '+ Novo Colaborador'
+        Margins.Top = 12.000000000000000000
+        Margins.Bottom = 12.000000000000000000
+      end
+      object CmbFiltroPapel: TComboBox
+        Align = Right
+        Size.Width = 150.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        Margins.Top = 12.000000000000000000
+        Margins.Bottom = 12.000000000000000000
+        Margins.Right = 8.000000000000000000
+      end
+      object EdtBusca: TEdit
+        Align = Right
+        Size.Width = 220.000000000000000000
+        Size.Height = 36.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 14.000000000000000000
+        TextPrompt = 'Buscar por nome ou CPF...'
+        Margins.Top = 12.000000000000000000
+        Margins.Bottom = 12.000000000000000000
+        Margins.Right = 8.000000000000000000
+      end
+    end
+    object LayoutGridHeader: TLayout
+      Align = Top
+      Size.Height = 36.000000000000000000
+      Size.PlatformDefault = False
+      Margins.Left = 16.000000000000000000
+      Margins.Right = 16.000000000000000000
+    end
+    object LayoutGrid: TLayout
+      Align = Client
+      Margins.Left = 16.000000000000000000
+      Margins.Right = 16.000000000000000000
+      Margins.Bottom = 16.000000000000000000
+      object ScrollGrid: TVertScrollBox
+        Align = Client
+      end
+    end
+  end
+  object LayoutOverlay: TLayout
+    Align = Contents
+    Visible = False
+    HitTest = True
+    object RectOverlay: TRectangle
+      Align = Client
+      Fill.Color = x99000000
+      Stroke.Kind = None
+      HitTest = False
+    end
+    object LayoutForm: TLayout
+      Align = Center
+      Size.Width = 480.000000000000000000
+      Size.Height = 560.000000000000000000
+      Size.PlatformDefault = False
+      object RectForm: TRectangle
+        Align = Client
+        Fill.Color = claWhite
+        Stroke.Kind = None
+        XRadius = 8.000000000000000000
+        YRadius = 8.000000000000000000
+        HitTest = False
+      end
+      object LblFormTitulo: TLabel
+        Align = Top
+        Size.Height = 44.000000000000000000
+        Size.PlatformDefault = False
+        StyledSettings = []
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        TextSettings.FontColor = xFF212121
+        TextSettings.HorzAlign = Center
+        TextSettings.VertAlign = Center
+        Text = 'Novo Colaborador'
+        Margins.Top = 8.000000000000000000
+      end
+    end
+  end
+end
